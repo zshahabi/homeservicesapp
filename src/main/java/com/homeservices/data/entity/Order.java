@@ -44,8 +44,8 @@ public class Order
     private LocalDateTime requestAt;
 
     @ManyToOne
-    @JoinColumn(name = "main_service_id", referencedColumnName = "id")
-    private MainService subService;
+    @JoinColumn(name = "sub_service_id", referencedColumnName = "id")
+    private SubService subService;
 
     @ManyToOne
     @JoinColumn(name = "expert_id", referencedColumnName = "id")

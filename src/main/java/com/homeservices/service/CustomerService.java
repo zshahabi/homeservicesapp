@@ -15,7 +15,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
-
 @Service
 public record CustomerService(CustomerRepository repository , AddressService addressService)
 {
@@ -24,14 +23,7 @@ public record CustomerService(CustomerRepository repository , AddressService add
     {
         try
         {
-            Address address = new Address();
-
-            DTOAddress address1 = dtoRegister.getAddress();
-            address.setAlley(address1.getAlley());
-            address.setStreet(address1.getStreet());
-            address.setPostalCode(address1.getPostalCode());
-
-            address = addressService.repository().save(address);
+            Address address = addressService.addAddress(dtoRegister.getAddress());
 
             Customer user = new Customer();
             user.setName(dtoRegister.getName());
@@ -62,7 +54,7 @@ public record CustomerService(CustomerRepository repository , AddressService add
         return execute(select).getResultList();
     }
 
-    public Customer getUserById(int id)
+    public Customer getUserById(long id)
     {
         CriteriaBuilder criteriaBuilder = SpringConfig.getEntityManager().getCriteriaBuilder();
 
