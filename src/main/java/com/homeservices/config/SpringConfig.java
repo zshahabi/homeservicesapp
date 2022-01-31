@@ -1,5 +1,6 @@
 package com.homeservices.config;
 
+import com.homeservices.Application;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -20,7 +21,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@EnableJpaRepositories
+@EnableJpaRepositories(basePackages = "com.homeservices.data.repository")
 @PropertySource("classpath:application.properties")
 @ComponentScan("com.homeservices")
 public class SpringConfig
