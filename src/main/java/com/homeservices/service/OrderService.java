@@ -11,7 +11,9 @@ import com.homeservices.data.repository.OrderRepository;
 import com.homeservices.dto.DTOAddOrder;
 import com.homeservices.exception.NotFoundOrderException;
 import com.homeservices.exception.NotFoundSubServiceException;
+import com.homeservices.exception.NotFoundSuggestion;
 import com.homeservices.exception.NotFoundUserException;
+import com.homeservices.exception.ThePaymentAmountIsInsufficient;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -102,5 +104,42 @@ public record OrderService(OrderRepository repository , CustomerService customer
         else throw new NotFoundOrderException(orderId);
     }
 
-    
+    public boolean payment(final long orderId , final int price) throws NotFoundOrderException, NotFoundSuggestion, ThePaymentAmountIsInsufficient
+    {
+        Optional<Order> byOrderId = repository.findById(orderId);
+        if (byOrderId.isPresent())
+        {
+            Suggestion suggestion = suggestionService.repository().findByOrderId(orderId);
+
+            if (suggestion != null)
+            {
+                Order order = byOrderId.get();
+
+                int orderPrice = order.getSubService().getPrice();
+
+                final int pricePayment = (price == 0) ? order.getCustomer().getAccountCredit() : price;
+
+                if (pricePayment < orderPrice)
+                {
+                    if (price == 0)
+                    {
+                        Customer customer = order.getCustomer();
+                        customer.setAccountCredit(pricePayment - orderPrice);
+                        customerService.repository().save(customer);
+                    }
+
+                    Experts expert = order.getExperts();
+
+                    expert.setAccountCredit(expert.getAccountCredit() + pricePayment);
+                    expertService.repository().save(expert);
+
+                    return changeStatus(orderId , OrderStatus.paid);
+                }
+                else throw new ThePaymentAmountIsInsufficient(orderPrice , pricePayment);
+            }
+            else throw new NotFoundSuggestion();
+        }
+        else throw new NotFoundOrderException(orderId);
+    }
+
 }

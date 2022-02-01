@@ -10,4 +10,6 @@ import java.util.List;
 public interface SuggestionRepository extends JpaRepository<Suggestion, Long>
 {
     Suggestion findByExpertIdAndOrderId(final long expertId , final long orderId);
+
+    Suggestion findByOrderId(final long orderId);
 }
