@@ -2,8 +2,8 @@ package com.homeservices.exception;
 
 public class NotFoundUserException extends Exception
 {
-    public NotFoundUserException(String message)
+    public NotFoundUserException(final String typeUser , final long id)
     {
-        super(message);
+        super("Not found " + typeUser + " id: " + id);
     }
 }

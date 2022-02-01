@@ -52,8 +52,8 @@ public record OrderService(OrderRepository repository , CustomerService customer
                 }
                 else throw new NotFoundSubServiceException(dtoAddOrder.getName());
             }
-            else throw new NotFoundUserException("Not found expert id: " + dtoAddOrder.getExpert());
+            else throw new NotFoundUserException("expert" , dtoAddOrder.getExpert());
         }
-        else throw new NotFoundUserException("Not found customer id: " + dtoAddOrder.getCustomer());
+        else throw new NotFoundUserException("customer" , dtoAddOrder.getCustomer());
     }
 }
