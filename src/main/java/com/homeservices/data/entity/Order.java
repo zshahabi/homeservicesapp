@@ -1,5 +1,6 @@
 package com.homeservices.data.entity;
 
+import com.homeservices.data.enums.OrderStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

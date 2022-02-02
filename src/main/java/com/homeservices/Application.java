@@ -1,6 +1,6 @@
 package com.homeservices;
 
-import com.homeservices.data.entity.UserStatus;
+import com.homeservices.data.enums.UserStatus;
 import com.homeservices.dto.DTOAddress;
 import com.homeservices.dto.DTORegister;
 import com.homeservices.service.MainServicesService;

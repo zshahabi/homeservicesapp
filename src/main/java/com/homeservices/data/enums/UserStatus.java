@@ -1,4 +1,4 @@
-package com.homeservices.data.entity;
+package com.homeservices.data.enums;
 
 public enum UserStatus
 {

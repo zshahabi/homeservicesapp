@@ -4,6 +4,8 @@ import com.homeservices.data.entity.MainService;
 import com.homeservices.data.repository.MainServiceRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public record MainServicesService(MainServiceRepository repository)
 {
@@ -32,5 +34,10 @@ public record MainServicesService(MainServiceRepository repository)
                 System.out.println(e.getMessage());
             }
         }
+    }
+
+    public List<MainService> mainServices()
+    {
+        return repository.findAll();
     }
 }

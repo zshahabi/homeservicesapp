@@ -3,7 +3,7 @@ package com.homeservices.service;
 import com.homeservices.config.SpringConfig;
 import com.homeservices.data.entity.Address;
 import com.homeservices.data.entity.Experts;
-import com.homeservices.data.entity.UserStatus;
+import com.homeservices.data.enums.UserStatus;
 import com.homeservices.data.repository.ExpertRepository;
 import com.homeservices.dto.DTOExpertRegister;
 import com.homeservices.exception.ImageSizeException;

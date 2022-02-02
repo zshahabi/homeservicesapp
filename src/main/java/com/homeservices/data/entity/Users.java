@@ -1,11 +1,10 @@
 package com.homeservices.data.entity;
 
-import lombok.Data;
+import com.homeservices.data.enums.UserStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;

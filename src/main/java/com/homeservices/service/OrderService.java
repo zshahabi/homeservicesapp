@@ -4,7 +4,7 @@ import com.homeservices.data.entity.Address;
 import com.homeservices.data.entity.Customer;
 import com.homeservices.data.entity.Experts;
 import com.homeservices.data.entity.Order;
-import com.homeservices.data.entity.OrderStatus;
+import com.homeservices.data.enums.OrderStatus;
 import com.homeservices.data.entity.SubService;
 import com.homeservices.data.entity.Suggestion;
 import com.homeservices.data.repository.OrderRepository;
@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Service
 public record OrderService(OrderRepository repository , CustomerService customerService , ExpertService expertService ,
-                           AddressService addressService , SubServicesService subServicesService ,
+                           SubServicesService subServicesService ,
                            SuggestionService suggestionService)
 {
 
@@ -39,7 +39,7 @@ public record OrderService(OrderRepository repository , CustomerService customer
                 {
                     Experts expert = byId.get();
 
-                    Address address = addressService.addAddress(dtoAddOrder.getAddress());
+                    Address address = customerService.addressService().addAddress(dtoAddOrder.getAddress());
 
                     Order order = new Order();
                     order.setAddress(address);

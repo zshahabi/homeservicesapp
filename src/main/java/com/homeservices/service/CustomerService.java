@@ -3,9 +3,8 @@ package com.homeservices.service;
 import com.homeservices.config.SpringConfig;
 import com.homeservices.data.entity.Address;
 import com.homeservices.data.entity.Customer;
-import com.homeservices.data.entity.UserStatus;
+import com.homeservices.data.enums.UserStatus;
 import com.homeservices.data.repository.CustomerRepository;
-import com.homeservices.dto.DTOAddress;
 import com.homeservices.dto.DTORegister;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +50,14 @@ public record CustomerService(CustomerRepository repository , AddressService add
         CriteriaQuery<Customer> query = criteriaBuilder.createQuery(Customer.class);
         Root<Customer> from = query.from(Customer.class);
         CriteriaQuery<Customer> select = query.select(from);
-        return execute(select).getResultList();
+        try
+        {
+            return execute(select).getResultList();
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     public Customer getUserById(long id)
@@ -64,10 +70,17 @@ public record CustomerService(CustomerRepository repository , AddressService add
 
         select.where(criteriaBuilder.equal(from.get("id") , id));
 
-        return execute(select).getSingleResult();
+        try
+        {
+            return execute(select).getSingleResult();
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
-    public Customer getUserByUsernameAndPassword(final String username , final String password)
+    public Customer getUserByUEmailAndPassword(final String email , final String password)
     {
         CriteriaBuilder criteriaBuilder = SpringConfig.getEntityManager().getCriteriaBuilder();
 
@@ -75,9 +88,16 @@ public record CustomerService(CustomerRepository repository , AddressService add
         Root<Customer> from = query.from(Customer.class);
         CriteriaQuery<Customer> select = query.select(from);
 
-        select.where(criteriaBuilder.equal(from.get("username") , username) , criteriaBuilder.equal(from.get("password") , password));
+        select.where(criteriaBuilder.equal(from.get("email") , email) , criteriaBuilder.equal(from.get("password") , password));
 
-        return execute(select).getSingleResult();
+        try
+        {
+            return execute(select).getSingleResult();
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     public List<Customer> getUserByStatus(UserStatus userStatus)
@@ -90,7 +110,14 @@ public record CustomerService(CustomerRepository repository , AddressService add
 
         select.where(criteriaBuilder.equal(from.get("userStatus") , userStatus));
 
-        return execute(select).getResultList();
+        try
+        {
+            return execute(select).getResultList();
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     private TypedQuery<Customer> execute(final CriteriaQuery<Customer> criteriaQuery)

@@ -3,6 +3,7 @@ package com.homeservices.service;
 import com.homeservices.data.entity.Experts;
 import com.homeservices.data.entity.Order;
 import com.homeservices.data.entity.Suggestion;
+import com.homeservices.data.repository.OrderRepository;
 import com.homeservices.data.repository.SuggestionRepository;
 import com.homeservices.dto.DTOAddSuggestion;
 import com.homeservices.exception.NotFoundOrderException;
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @Service
 public record SuggestionService(SuggestionRepository repository , ExpertService expertService ,
-                                OrderService orderService)
+                                OrderRepository orderRepository)
 {
 
     public boolean addSuggestion(final DTOAddSuggestion dtoAddSuggestion) throws NotFoundUserException, NotFoundOrderException
@@ -21,7 +22,7 @@ public record SuggestionService(SuggestionRepository repository , ExpertService 
         Optional<Experts> byExpertId = expertService.repository().findById(dtoAddSuggestion.getExpert());
         if (byExpertId.isPresent())
         {
-            Optional<Order> byOrderId = orderService.repository().findById(dtoAddSuggestion.getOrder());
+            Optional<Order> byOrderId = orderRepository.findById(dtoAddSuggestion.getOrder());
             if (byOrderId.isPresent())
             {
                 Suggestion suggestion = new Suggestion();

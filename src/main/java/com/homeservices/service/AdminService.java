@@ -2,8 +2,7 @@ package com.homeservices.service;
 
 import com.homeservices.data.entity.Address;
 import com.homeservices.data.entity.Admin;
-import com.homeservices.data.entity.Customer;
-import com.homeservices.data.entity.UserStatus;
+import com.homeservices.data.enums.UserStatus;
 import com.homeservices.data.repository.AdminRepository;
 import com.homeservices.dto.DTORegister;
 import org.springframework.stereotype.Service;
