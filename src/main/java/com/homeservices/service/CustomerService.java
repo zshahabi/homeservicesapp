@@ -2,7 +2,6 @@ package com.homeservices.service;
 
 import com.homeservices.config.SpringConfig;
 import com.homeservices.data.entity.Address;
-import com.homeservices.data.entity.Admin;
 import com.homeservices.data.entity.Customer;
 import com.homeservices.data.enums.UserStatus;
 import com.homeservices.data.repository.CustomerRepository;

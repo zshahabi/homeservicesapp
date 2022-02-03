@@ -9,6 +9,7 @@ import com.homeservices.data.entity.SubService;
 import com.homeservices.data.entity.Suggestion;
 import com.homeservices.data.repository.OrderRepository;
 import com.homeservices.dto.DTOAddOrder;
+import com.homeservices.exception.NotFoundExpertException;
 import com.homeservices.exception.NotFoundOrderException;
 import com.homeservices.exception.NotFoundSubServiceException;
 import com.homeservices.exception.NotFoundSuggestion;
@@ -80,25 +81,52 @@ public record OrderService(OrderRepository repository , CustomerService customer
 
     public boolean acceptExpert(final long expertId , final long orderId) throws NotFoundUserException, NotFoundOrderException
     {
+        final ResultCheckExpertOrderId expertOrderId = checkExpertOrderId(orderId , expertId);
+        if (expertOrderId != null)
+        {
+            Suggestion suggestion = suggestionService().repository().findByExpertIdAndOrderId(expertId , orderId);
+
+            if (suggestion != null)
+            {
+                Order order = expertOrderId.order();
+                order.setExperts(expertOrderId.expert());
+                repository.save(order);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean removeExpert(final long expertId , final long orderId) throws NotFoundOrderException, NotFoundUserException, NotFoundExpertException
+    {
+        ResultCheckExpertOrderId expertOrderId = checkExpertOrderId(orderId , expertId);
+        if (expertOrderId != null)
+        {
+            final Order byIdAndExpertsId = repository.findByIdAndExpertsId(orderId , expertId);
+            if (byIdAndExpertsId != null)
+            {
+                Order order = expertOrderId.order();
+
+                order.setExperts(null);
+
+                repository.save(order);
+
+            }
+            else throw new NotFoundExpertException();
+        }
+
+        return false;
+    }
+
+    private ResultCheckExpertOrderId checkExpertOrderId(final long orderId , final long expertId) throws NotFoundUserException, NotFoundOrderException
+    {
         Optional<Order> byOrderId = repository.findById(orderId);
         if (byOrderId.isPresent())
         {
             Optional<Experts> byExpertId = expertService.repository().findById(expertId);
-            if (byExpertId.isPresent())
-            {
-
-                Suggestion suggestion = suggestionService().repository().findByExpertIdAndOrderId(expertId , orderId);
-
-                if (suggestion != null)
-                {
-                    Order order = byOrderId.get();
-                    order.setExperts(byExpertId.get());
-                    repository.save(order);
-
-                    return true;
-                }
-                else return false;
-            }
+            if (byExpertId.isPresent()) return new ResultCheckExpertOrderId(byOrderId.get() , byExpertId.get());
             else throw new NotFoundUserException("expert" , expertId);
         }
         else throw new NotFoundOrderException(orderId);
@@ -142,4 +170,7 @@ public record OrderService(OrderRepository repository , CustomerService customer
         else throw new NotFoundOrderException(orderId);
     }
 
+    public record ResultCheckExpertOrderId(Order order , Experts expert)
+    {
+    }
 }
