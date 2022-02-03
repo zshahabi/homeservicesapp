@@ -2,10 +2,12 @@ package com.homeservices.service;
 
 import com.homeservices.config.SpringConfig;
 import com.homeservices.data.entity.Address;
+import com.homeservices.data.entity.Admin;
 import com.homeservices.data.entity.Customer;
 import com.homeservices.data.enums.UserStatus;
 import com.homeservices.data.repository.CustomerRepository;
 import com.homeservices.dto.DTORegister;
+import com.homeservices.exception.NotFoundUserException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.TypedQuery;
@@ -13,6 +15,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public record CustomerService(CustomerRepository repository , AddressService addressService)
@@ -42,6 +45,21 @@ public record CustomerService(CustomerRepository repository , AddressService add
         }
 
         return false;
+    }
+
+    public boolean changePassword(final long customerId , final String newPassword) throws NotFoundUserException
+    {
+        Optional<Customer> byId = repository.findById(customerId);
+        if (byId.isPresent())
+        {
+            Customer customer = byId.get();
+            customer.setPassword(newPassword);
+
+            repository.save(customer);
+
+            return true;
+        }
+        else throw new NotFoundUserException("customer" , customerId);
     }
 
     public List<Customer> getAllCustomer()

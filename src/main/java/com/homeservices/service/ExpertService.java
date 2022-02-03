@@ -2,11 +2,13 @@ package com.homeservices.service;
 
 import com.homeservices.config.SpringConfig;
 import com.homeservices.data.entity.Address;
+import com.homeservices.data.entity.Customer;
 import com.homeservices.data.entity.Experts;
 import com.homeservices.data.enums.UserStatus;
 import com.homeservices.data.repository.ExpertRepository;
 import com.homeservices.dto.DTOExpertRegister;
 import com.homeservices.exception.ImageSizeException;
+import com.homeservices.exception.NotFoundUserException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.TypedQuery;
@@ -14,6 +16,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public record ExpertService(ExpertRepository repository , AddressService addressService)
@@ -44,6 +47,20 @@ public record ExpertService(ExpertRepository repository , AddressService address
         user = repository.save(user);
 
         return user.getId() > 0;
+    }
+
+    public boolean changePassword(final long expertId , final String newPassword) throws NotFoundUserException
+    {
+        Optional<Experts> byId = repository.findById(expertId);
+        if (byId.isPresent())
+        {
+            Experts expert = byId.get();
+            expert.setPassword(newPassword);
+            repository.save(expert);
+
+            return true;
+        }
+        else throw new NotFoundUserException("expert" , expertId);
     }
 
     public List<Experts> getExpertByAreaOfExpertise(final String areaOfExpertise)
