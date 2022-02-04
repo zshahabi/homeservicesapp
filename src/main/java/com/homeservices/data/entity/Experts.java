@@ -7,6 +7,9 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,4 +24,7 @@ public class Experts extends Users
     private int rating;
 
     private String areaOfExpertise;
+
+    @ManyToMany
+    private Set<SubService> subServices = new HashSet<>();
 }

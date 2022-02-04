@@ -6,4 +6,9 @@ public class NotFoundSubServiceException extends Exception
     {
         super("Not found sub service: " + name);
     }
+
+    public NotFoundSubServiceException(final long id)
+    {
+        super("Not found sub service: " + id);
+    }
 }
