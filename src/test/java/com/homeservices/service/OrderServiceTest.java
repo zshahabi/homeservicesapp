@@ -6,7 +6,7 @@ import com.homeservices.dto.DTOAddOrder;
 import com.homeservices.dto.DTOAddress;
 import com.homeservices.exception.NotFoundOrderException;
 import com.homeservices.exception.NotFoundSubServiceException;
-import com.homeservices.exception.NotFoundSuggestion;
+import com.homeservices.exception.NotFoundSuggestionException;
 import com.homeservices.exception.NotFoundUserException;
 import com.homeservices.exception.ThePaymentAmountIsInsufficient;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,7 +94,7 @@ class OrderServiceTest
 
             assertTrue(payment);
         }
-        catch (NotFoundOrderException | NotFoundSuggestion | ThePaymentAmountIsInsufficient e)
+        catch (NotFoundOrderException | NotFoundSuggestionException | ThePaymentAmountIsInsufficient e)
         {
             e.printStackTrace();
         }

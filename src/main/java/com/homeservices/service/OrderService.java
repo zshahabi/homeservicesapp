@@ -12,11 +12,12 @@ import com.homeservices.dto.DTOAddOrder;
 import com.homeservices.exception.NotFoundExpertException;
 import com.homeservices.exception.NotFoundOrderException;
 import com.homeservices.exception.NotFoundSubServiceException;
-import com.homeservices.exception.NotFoundSuggestion;
+import com.homeservices.exception.NotFoundSuggestionException;
 import com.homeservices.exception.NotFoundUserException;
 import com.homeservices.exception.ThePaymentAmountIsInsufficient;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -132,14 +133,14 @@ public record OrderService(OrderRepository repository , CustomerService customer
         else throw new NotFoundOrderException(orderId);
     }
 
-    public boolean payment(final long orderId , final int price) throws NotFoundOrderException, NotFoundSuggestion, ThePaymentAmountIsInsufficient
+    public boolean payment(final long orderId , final int price) throws NotFoundOrderException, NotFoundSuggestionException, ThePaymentAmountIsInsufficient
     {
         Optional<Order> byOrderId = repository.findById(orderId);
         if (byOrderId.isPresent())
         {
-            Suggestion suggestion = suggestionService.repository().findByOrderId(orderId);
+            List<Suggestion> suggestion = suggestionService.repository().findByOrderId(orderId);
 
-            if (suggestion != null)
+            if (suggestion != null && suggestion.size() > 0)
             {
                 Order order = byOrderId.get();
 
@@ -165,7 +166,7 @@ public record OrderService(OrderRepository repository , CustomerService customer
                 }
                 else throw new ThePaymentAmountIsInsufficient(orderPrice , pricePayment);
             }
-            else throw new NotFoundSuggestion();
+            else throw new NotFoundSuggestionException();
         }
         else throw new NotFoundOrderException(orderId);
     }
