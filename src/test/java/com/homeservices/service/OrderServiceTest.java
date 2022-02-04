@@ -4,6 +4,7 @@ import com.homeservices.config.SpringConfig;
 import com.homeservices.data.enums.OrderStatus;
 import com.homeservices.dto.DTOAddOrder;
 import com.homeservices.dto.DTOAddress;
+import com.homeservices.exception.NotFoundExpertException;
 import com.homeservices.exception.NotFoundOrderException;
 import com.homeservices.exception.NotFoundSubServiceException;
 import com.homeservices.exception.NotFoundSuggestionException;
@@ -80,6 +81,21 @@ class OrderServiceTest
             assertTrue(acceptExpert);
         }
         catch (NotFoundUserException | NotFoundOrderException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void removeExpert()
+    {
+        try
+        {
+            boolean removeExpert = orderService.removeExpert(2 , 1);
+
+            assertTrue(removeExpert);
+        }
+        catch (NotFoundOrderException | NotFoundUserException | NotFoundExpertException e)
         {
             e.printStackTrace();
         }

@@ -7,6 +7,8 @@ import com.homeservices.dto.DTOAddress;
 import com.homeservices.dto.DTOExpertRegister;
 import com.homeservices.dto.DTORegister;
 import com.homeservices.exception.ImageSizeException;
+import com.homeservices.exception.NotFoundSubServiceException;
+import com.homeservices.exception.NotFoundUserException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -59,6 +61,37 @@ class ExpertServiceTest
             e.printStackTrace();
         }
 
+    }
+
+    @Test
+    void changePassword()
+    {
+        try
+        {
+            boolean changePassword = expertService.changePassword(2 , "1215454");
+
+            assertTrue(changePassword);
+        }
+        catch (NotFoundUserException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    void addSubService()
+    {
+        try
+        {
+            boolean addSubService = expertService.addSubService(2 , 2);
+
+            assertTrue(addSubService);
+        }
+        catch (NotFoundUserException | NotFoundSubServiceException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Test
