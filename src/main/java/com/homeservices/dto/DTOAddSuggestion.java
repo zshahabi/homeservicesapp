@@ -13,4 +13,6 @@ public class DTOAddSuggestion
     private long order;
     private String suggestion;
     private int price;
+    private String timeDo;
+    private String startTime;
 }

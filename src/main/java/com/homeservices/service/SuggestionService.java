@@ -32,6 +32,8 @@ public record SuggestionService(SuggestionRepository repository , ExpertService 
                 suggestion.setExpert(byExpertId.get());
                 suggestion.setOrder(byOrderId.get());
                 suggestion.setPrice(dtoAddSuggestion.getPrice());
+                suggestion.setTimeDo(dtoAddSuggestion.getTimeDo());
+                suggestion.setStartTime(dtoAddSuggestion.getStartTime());
 
                 suggestion = repository.save(suggestion);
 
@@ -88,5 +90,5 @@ public record SuggestionService(SuggestionRepository repository , ExpertService 
         else throw new NotFoundOrderException(orderId);
     }
 
-    
+
 }

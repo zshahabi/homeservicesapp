@@ -33,6 +33,11 @@ public class Suggestion
 
     private int price;
 
+    // تاریخ انجام
+    private String timeDo;
+
+    private String startTime;
+
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     private Order order;
