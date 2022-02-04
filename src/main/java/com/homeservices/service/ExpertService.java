@@ -7,6 +7,7 @@ import com.homeservices.data.entity.SubService;
 import com.homeservices.data.enums.UserStatus;
 import com.homeservices.data.repository.ExpertRepository;
 import com.homeservices.dto.DTOExpertRegister;
+import com.homeservices.exception.FoundSubServiceException;
 import com.homeservices.exception.ImageSizeException;
 import com.homeservices.exception.NotFoundSubServiceException;
 import com.homeservices.exception.NotFoundUserException;
@@ -52,7 +53,7 @@ public record ExpertService(ExpertRepository repository , AddressService address
         return user.getId() > 0;
     }
 
-    public boolean addSubService(final long subServiceId , final long expertId) throws NotFoundUserException, NotFoundSubServiceException
+    public boolean addSubService(final long subServiceId , final long expertId) throws NotFoundUserException, NotFoundSubServiceException, FoundSubServiceException
     {
         final Optional<Experts> byExpertId = repository.findById(expertId);
         if (byExpertId.isPresent())
@@ -63,6 +64,13 @@ public record ExpertService(ExpertRepository repository , AddressService address
                 final Experts expert = byExpertId.get();
 
                 final Set<SubService> subServices = expert.getSubServices();
+
+                for (SubService subService : subServices)
+                {
+                    if (subService.getId() == subServiceId)
+                        throw new FoundSubServiceException(subService.getName());
+                }
+
                 subServices.add(bySubServiceId.get());
                 expert.setSubServices(subServices);
 

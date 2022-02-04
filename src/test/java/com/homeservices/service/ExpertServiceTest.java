@@ -6,6 +6,7 @@ import com.homeservices.data.enums.UserStatus;
 import com.homeservices.dto.DTOAddress;
 import com.homeservices.dto.DTOExpertRegister;
 import com.homeservices.dto.DTORegister;
+import com.homeservices.exception.FoundSubServiceException;
 import com.homeservices.exception.ImageSizeException;
 import com.homeservices.exception.NotFoundSubServiceException;
 import com.homeservices.exception.NotFoundUserException;
@@ -88,7 +89,7 @@ class ExpertServiceTest
 
             assertTrue(addSubService);
         }
-        catch (NotFoundUserException | NotFoundSubServiceException e)
+        catch (NotFoundUserException | NotFoundSubServiceException | FoundSubServiceException e)
         {
             e.printStackTrace();
         }
