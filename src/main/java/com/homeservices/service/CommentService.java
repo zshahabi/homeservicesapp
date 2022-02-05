@@ -7,7 +7,6 @@ import com.homeservices.data.repository.CommentRepository;
 import com.homeservices.exception.NotFoundOrderException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,20 +33,5 @@ public record CommentService(CommentRepository repository , OrderService orderSe
 
         }
         else throw new NotFoundOrderException(orderId);
-    }
-
-    public List<Comments> byOrderComment(final long orderId)
-    {
-        return repository.findByOrderId(orderId);
-    }
-
-    public List<Comments> byCustomer(final long customerId)
-    {
-        return repository.findByCustomerId(customerId);
-    }
-
-    public List<Comments> byCommentsOrderCustomer(final long customerId , final long orderId)
-    {
-        return repository.findByCustomerIdAndOrderId(customerId , orderId);
     }
 }
