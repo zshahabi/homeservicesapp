@@ -1,5 +1,6 @@
 package com.homeservices.data.entity;
 
+import com.homeservices.data.enums.OrderStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
@@ -44,8 +46,8 @@ public class Order
     private LocalDateTime requestAt;
 
     @ManyToOne
-    @JoinColumn(name = "main_service_id", referencedColumnName = "id")
-    private MainService subService;
+    @JoinColumn(name = "sub_service_id", referencedColumnName = "id")
+    private SubService subService;
 
     @ManyToOne
     @JoinColumn(name = "expert_id", referencedColumnName = "id")
@@ -54,4 +56,8 @@ public class Order
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status")
     private OrderStatus orderStatus;
+
+    @OneToOne
+    @JoinColumn(name = "des_customer_id", referencedColumnName = "id")
+    private DescriptionCustomerOrder descriptionCustomerOrder;
 }

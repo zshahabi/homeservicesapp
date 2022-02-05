@@ -9,25 +9,36 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.Set;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
 @Entity
-@Table(name = "main_service")
-public class MainService
+@Table(name = "suggestion")
+public class Suggestion
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(unique = true, nullable = false)
     private long id;
 
-    @Column(name = "main_service_name", unique = true, nullable = false)
-    private String name;
+    private String suggestion;
 
-    @OneToMany
-    private Set<SubService> services;
+    @ManyToOne
+    @JoinColumn(name = "expert_id", referencedColumnName = "id")
+    private Experts expert;
+
+    private int price;
+
+    // تاریخ انجام
+    private String timeDo;
+
+    private String startTime;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    private Order order;
 }
