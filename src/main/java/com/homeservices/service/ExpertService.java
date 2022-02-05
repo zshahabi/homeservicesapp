@@ -27,7 +27,6 @@ public record ExpertService(ExpertRepository repository , AddressService address
 {
     private static final int MAX_LEN_IMAGE = 300000;
 
-
     public boolean register(DTOExpertRegister dtoExpertRegister) throws ImageSizeException
     {
 
