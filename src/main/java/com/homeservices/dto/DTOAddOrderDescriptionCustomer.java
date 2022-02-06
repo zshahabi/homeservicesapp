@@ -7,12 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class DTOAddOrder
+public final class DTOAddOrderDescriptionCustomer extends DTOAddOrder
 {
-    private String name;
-    private long customer;
+    private long price;
     private String description;
-    private DTOAddress address;
-    private String subServiceName;
-    private long expert;
+    private String timeDo;
 }
