@@ -156,18 +156,33 @@ public record OrderService(OrderRepository repository , CustomerService customer
     public boolean acceptExpert(final long expertId , final long orderId) throws NotFoundUserException, NotFoundOrderException
     {
         final ResultCheckExpertOrderId expertOrderId = checkExpertOrderId(orderId , expertId);
-        if (expertOrderId != null)
+        Suggestion suggestion = suggestionService().repository().findByExpertIdAndOrderId(expertId , orderId);
+
+        if (suggestion != null)
         {
-            Suggestion suggestion = suggestionService().repository().findByExpertIdAndOrderId(expertId , orderId);
+            Order order = expertOrderId.order();
+            order.setExperts(expertOrderId.expert());
+            repository.save(order);
 
-            if (suggestion != null)
-            {
-                Order order = expertOrderId.order();
-                order.setExperts(expertOrderId.expert());
-                repository.save(order);
+            return true;
+        }
 
-                return true;
-            }
+        return false;
+    }
+
+    public boolean acceptExpertByCustomer(final long expertId , final long orderId , final long customerId) throws NotFoundUserException, NotFoundOrderException
+    {
+        final ResultCheckExpertOrderId expertOrderId = checkExpertOrderId(orderId , expertId);
+        Suggestion suggestion = suggestionService().repository().findByOrderIdAndExpertIdAndOrderCustomerId(orderId , expertId , customerId);
+
+        if (suggestion != null)
+        {
+            Order order = expertOrderId.order();
+            order.setExperts(expertOrderId.expert());
+            order.setOrderStatus(OrderStatus.waiting_for_the_specialist_to_come_to_your_place);
+            repository.save(order);
+
+            return true;
         }
 
         return false;
@@ -204,6 +219,11 @@ public record OrderService(OrderRepository repository , CustomerService customer
             else throw new NotFoundUserException("expert" , expertId);
         }
         else throw new NotFoundOrderException(orderId);
+    }
+
+    public List<Order> getByStatus(final OrderStatus orderStatus)
+    {
+        return repository.findByOrderStatus(orderStatus);
     }
 
     public boolean payment(final long orderId , final int price) throws NotFoundOrderException, NotFoundSuggestionException, ThePaymentAmountIsInsufficient

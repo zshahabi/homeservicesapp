@@ -1,22 +1,27 @@
 package com.homeservices.service;
 
+import com.homeservices.data.entity.Customer;
 import com.homeservices.data.entity.Experts;
 import com.homeservices.data.entity.Order;
+import com.homeservices.data.entity.SubService;
 import com.homeservices.data.entity.Suggestion;
+import com.homeservices.data.repository.CustomerRepository;
 import com.homeservices.data.repository.OrderRepository;
 import com.homeservices.data.repository.SuggestionRepository;
 import com.homeservices.dto.DTOAddSuggestion;
 import com.homeservices.exception.NotFoundOrderException;
 import com.homeservices.exception.NotFoundSuggestionException;
 import com.homeservices.exception.NotFoundUserException;
+import com.homeservices.exception.ThisExcerptIsNotAnExpertInThisFieldException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public record SuggestionService(SuggestionRepository repository , ExpertService expertService ,
-                                OrderRepository orderRepository)
+                                OrderRepository orderRepository , CustomerRepository customerRepository)
 {
 
     public boolean addSuggestion(final DTOAddSuggestion dtoAddSuggestion) throws NotFoundUserException, NotFoundOrderException
@@ -107,4 +112,45 @@ public record SuggestionService(SuggestionRepository repository , ExpertService 
         else throw new NotFoundOrderException(orderId);
     }
 
+    public boolean addSuggestionInAllSubServiceOrder(final DTOAddSuggestion dtoAddSuggestion , final String subServiceName) throws NotFoundUserException, ThisExcerptIsNotAnExpertInThisFieldException, NotFoundOrderException
+    {
+        Optional<Experts> byExpertId = expertService.repository().findById(dtoAddSuggestion.getExpert());
+        if (byExpertId.isPresent())
+        {
+            final Experts expert = byExpertId.get();
+            final Set<SubService> subServices = expert.getSubServices();
+
+            boolean ok = false;
+            for (SubService subService : subServices)
+            {
+                if (subService.getName().equals(subServiceName))
+                {
+                    ok = true;
+                    break;
+                }
+            }
+
+            if (ok) return addSuggestion(dtoAddSuggestion);
+            else throw new ThisExcerptIsNotAnExpertInThisFieldException();
+
+        }
+        else throw new NotFoundUserException("expert" , dtoAddSuggestion.getExpert());
+    }
+
+    public List<Suggestion> getAllSuggestions(final long orderId , final long customer) throws NotFoundOrderException, NotFoundUserException, NotFoundSuggestionException
+    {
+        Optional<Order> byOrderId = orderRepository.findById(orderId);
+        if (byOrderId.isPresent())
+        {
+            final Optional<Customer> byCustomerId = customerRepository.findById(customer);
+            if (byCustomerId.isPresent())
+            {
+                final List<Suggestion> suggestions = repository.findByOrderIdAndOrderCustomerId(orderId , customer);
+                if (suggestions.size() > 0) return suggestions;
+                else throw new NotFoundSuggestionException();
+            }
+            else throw new NotFoundUserException("customer" , customer);
+        }
+        else throw new NotFoundOrderException(orderId);
+    }
 }
