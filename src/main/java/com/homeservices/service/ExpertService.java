@@ -3,16 +3,12 @@ package com.homeservices.service;
 import com.homeservices.config.SpringConfig;
 import com.homeservices.data.entity.Address;
 import com.homeservices.data.entity.Experts;
-import com.homeservices.data.entity.Order;
 import com.homeservices.data.entity.SubService;
-import com.homeservices.data.enums.OrderStatus;
 import com.homeservices.data.enums.UserStatus;
 import com.homeservices.data.repository.ExpertRepository;
-import com.homeservices.data.repository.OrderRepository;
 import com.homeservices.dto.DTOExpertRegister;
 import com.homeservices.exception.FoundSubServiceException;
 import com.homeservices.exception.ImageSizeException;
-import com.homeservices.exception.NotFoundOrderException;
 import com.homeservices.exception.NotFoundSubServiceException;
 import com.homeservices.exception.NotFoundUserException;
 import org.springframework.stereotype.Service;
@@ -27,7 +23,7 @@ import java.util.Set;
 
 @Service
 public record ExpertService(ExpertRepository repository , AddressService addressService ,
-                            SubServicesService subServicesService , OrderRepository orderRepository)
+                            SubServicesService subServicesService)
 {
     private static final int MAX_LEN_IMAGE = 300000;
 
@@ -99,34 +95,6 @@ public record ExpertService(ExpertRepository repository , AddressService address
             return true;
         }
         else throw new NotFoundUserException("expert" , expertId);
-    }
-
-    public boolean acceptOrder(final long orderId , final long expertId) throws NotFoundUserException, NotFoundOrderException
-    {
-        final Optional<Experts> byExpertId = repository.findById(expertId);
-        if (byExpertId.isPresent())
-        {
-            final Optional<Order> byOrderId = orderRepository.findById(orderId);
-            if (byOrderId.isPresent())
-            {
-                final Order byIdAndExpertsId = orderRepository.findByIdAndExpertsId(orderId , expertId);
-
-                if (byIdAndExpertsId != null)
-                {
-
-                    byIdAndExpertsId.setOrderStatus(OrderStatus.expert_accepted);
-
-                    orderRepository.save(byIdAndExpertsId);
-
-                    return true;
-
-                }
-                else throw new NotFoundOrderException(orderId);
-            }
-            else throw new NotFoundOrderException(orderId);
-        }
-        else throw new NotFoundUserException("expert" , expertId);
-
     }
 
     public List<Experts> getExpertByAreaOfExpertise(final String areaOfExpertise)

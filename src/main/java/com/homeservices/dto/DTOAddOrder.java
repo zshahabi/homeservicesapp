@@ -1,5 +1,6 @@
 package com.homeservices.dto;
 
+import com.homeservices.data.entity.Address;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
