@@ -14,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
@@ -55,4 +56,8 @@ public class Order
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status")
     private OrderStatus orderStatus;
+
+    @OneToOne
+    @JoinColumn(name = "des_customer_id", referencedColumnName = "id")
+    private DescriptionCustomerOrder descriptionCustomerOrder;
 }
