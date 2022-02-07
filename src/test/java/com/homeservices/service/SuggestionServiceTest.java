@@ -6,6 +6,7 @@ import com.homeservices.dto.DTOAddSuggestion;
 import com.homeservices.exception.NotFoundOrderException;
 import com.homeservices.exception.NotFoundSuggestionException;
 import com.homeservices.exception.NotFoundUserException;
+import com.homeservices.exception.TheBidPriceIsLowerThanTheBasePriceException;
 import com.homeservices.exception.ThisExcerptIsNotAnExpertInThisFieldException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -122,7 +123,7 @@ class SuggestionServiceTest
 
             assertTrue(add);
         }
-        catch (NotFoundUserException | NotFoundOrderException | ThisExcerptIsNotAnExpertInThisFieldException e)
+        catch (NotFoundUserException | NotFoundOrderException | ThisExcerptIsNotAnExpertInThisFieldException | TheBidPriceIsLowerThanTheBasePriceException e)
         {
             e.printStackTrace();
         }
@@ -136,6 +137,21 @@ class SuggestionServiceTest
             List<Suggestion> allSuggestions = suggestionService.getAllSuggestions(5 , 8);
 
             assertNotNull(allSuggestions);
+        }
+        catch (NotFoundOrderException | NotFoundUserException | NotFoundSuggestionException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void getAllSuggestionsSortPrice()
+    {
+        try
+        {
+            List<Suggestion> allSuggestionsSortPrice = suggestionService.getAllSuggestionsSortPrice(2 , 2);
+
+            assertNotNull(allSuggestionsSortPrice);
         }
         catch (NotFoundOrderException | NotFoundUserException | NotFoundSuggestionException e)
         {
