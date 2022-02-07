@@ -154,4 +154,21 @@ public record SuggestionService(SuggestionRepository repository , ExpertService 
         }
         else throw new NotFoundOrderException(orderId);
     }
+
+    public List<Suggestion> getAllSuggestionsSortPrice(final long orderId , final long customer) throws NotFoundOrderException, NotFoundUserException, NotFoundSuggestionException
+    {
+        final Optional<Order> byOrderId = orderRepository.findById(orderId);
+        if (byOrderId.isPresent())
+        {
+            final Optional<Customer> byCustomerId = customerRepository.findById(customer);
+            if (byCustomerId.isPresent())
+            {
+                final List<Suggestion> suggestions = repository.findByOrderIdAndOrderCustomerId(orderId , customer , Sort.by(Sort.Direction.DESC , "price"));
+                if (suggestions.size() > 0) return suggestions;
+                else throw new NotFoundSuggestionException();
+            }
+            else throw new NotFoundUserException("customer" , customer);
+        }
+        else throw new NotFoundOrderException(orderId);
+    }
 }
