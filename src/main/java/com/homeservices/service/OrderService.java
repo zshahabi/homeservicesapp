@@ -20,11 +20,9 @@ import com.homeservices.exception.NotFoundSuggestionException;
 import com.homeservices.exception.NotFoundUserException;
 import com.homeservices.exception.ThePaymentAmountIsInsufficient;
 import com.homeservices.exception.ThisExcerptIsNotAnExpertInThisFieldException;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -90,7 +88,7 @@ public record OrderService(OrderRepository repository , CustomerService customer
                     boolean foundSubService = false;
                     for (SubService service : expert.getSubServices())
                     {
-                        if (Objects.equals(service.getId() , subService.getId()))
+                        if (service.getId() == subService.getId())
                         {
                             foundSubService = true;
                             break;

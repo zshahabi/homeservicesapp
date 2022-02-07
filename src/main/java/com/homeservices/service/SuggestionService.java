@@ -12,9 +12,7 @@ import com.homeservices.dto.DTOAddSuggestion;
 import com.homeservices.exception.NotFoundOrderException;
 import com.homeservices.exception.NotFoundSuggestionException;
 import com.homeservices.exception.NotFoundUserException;
-import com.homeservices.exception.TheBidPriceIsLowerThanTheBasePriceException;
 import com.homeservices.exception.ThisExcerptIsNotAnExpertInThisFieldException;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -114,7 +112,7 @@ public record SuggestionService(SuggestionRepository repository , ExpertService 
         else throw new NotFoundOrderException(orderId);
     }
 
-    public boolean addSuggestionInSubServiceOrder(final DTOAddSuggestion dtoAddSuggestion , final String subServiceName) throws NotFoundUserException, ThisExcerptIsNotAnExpertInThisFieldException, NotFoundOrderException, TheBidPriceIsLowerThanTheBasePriceException
+    public boolean addSuggestionInAllSubServiceOrder(final DTOAddSuggestion dtoAddSuggestion , final String subServiceName) throws NotFoundUserException, ThisExcerptIsNotAnExpertInThisFieldException, NotFoundOrderException
     {
         Optional<Experts> byExpertId = expertService.repository().findById(dtoAddSuggestion.getExpert());
         if (byExpertId.isPresent())
@@ -123,25 +121,16 @@ public record SuggestionService(SuggestionRepository repository , ExpertService 
             final Set<SubService> subServices = expert.getSubServices();
 
             boolean ok = false;
-
-            SubService subServiceSelected = null;
-
             for (SubService subService : subServices)
             {
                 if (subService.getName().equals(subServiceName))
                 {
-                    subServiceSelected = subService;
                     ok = true;
                     break;
                 }
             }
 
-            if (ok)
-            {
-                if (dtoAddSuggestion.getPrice() < subServiceSelected.getPrice())
-                    throw new TheBidPriceIsLowerThanTheBasePriceException(subServiceSelected.getPrice() , dtoAddSuggestion.getPrice());
-                else return addSuggestion(dtoAddSuggestion);
-            }
+            if (ok) return addSuggestion(dtoAddSuggestion);
             else throw new ThisExcerptIsNotAnExpertInThisFieldException();
 
         }
@@ -150,30 +139,13 @@ public record SuggestionService(SuggestionRepository repository , ExpertService 
 
     public List<Suggestion> getAllSuggestions(final long orderId , final long customer) throws NotFoundOrderException, NotFoundUserException, NotFoundSuggestionException
     {
-        final Optional<Order> byOrderId = orderRepository.findById(orderId);
+        Optional<Order> byOrderId = orderRepository.findById(orderId);
         if (byOrderId.isPresent())
         {
             final Optional<Customer> byCustomerId = customerRepository.findById(customer);
             if (byCustomerId.isPresent())
             {
-                final List<Suggestion> suggestions = repository.findByOrderIdAndOrderCustomerId(orderId , customer , Sort.by(Sort.Direction.DESC));
-                if (suggestions.size() > 0) return suggestions;
-                else throw new NotFoundSuggestionException();
-            }
-            else throw new NotFoundUserException("customer" , customer);
-        }
-        else throw new NotFoundOrderException(orderId);
-    }
-
-    public List<Suggestion> getAllSuggestionsSortPrice(final long orderId , final long customer) throws NotFoundOrderException, NotFoundUserException, NotFoundSuggestionException
-    {
-        final Optional<Order> byOrderId = orderRepository.findById(orderId);
-        if (byOrderId.isPresent())
-        {
-            final Optional<Customer> byCustomerId = customerRepository.findById(customer);
-            if (byCustomerId.isPresent())
-            {
-                final List<Suggestion> suggestions = repository.findByOrderIdAndOrderCustomerId(orderId , customer , Sort.by(Sort.Direction.DESC , "price"));
+                final List<Suggestion> suggestions = repository.findByOrderIdAndOrderCustomerId(orderId , customer);
                 if (suggestions.size() > 0) return suggestions;
                 else throw new NotFoundSuggestionException();
             }

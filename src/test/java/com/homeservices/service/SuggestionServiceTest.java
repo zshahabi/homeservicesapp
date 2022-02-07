@@ -118,7 +118,7 @@ class SuggestionServiceTest
 
         try
         {
-            boolean add = suggestionService.addSuggestionInSubServiceOrder(dtoAddSuggestion , "NAME");
+            boolean add = suggestionService.addSuggestionInAllSubServiceOrder(dtoAddSuggestion , "NAME");
 
             assertTrue(add);
         }
