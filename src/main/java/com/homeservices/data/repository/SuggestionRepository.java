@@ -1,6 +1,7 @@
 package com.homeservices.data.repository;
 
 import com.homeservices.data.entity.Suggestion;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +14,8 @@ public interface SuggestionRepository extends JpaRepository<Suggestion, Long>
 
     List<Suggestion> findByOrderId(final long orderId);
 
-    List<Suggestion> findByOrderIdAndOrderCustomerId(final long orderId , final long customerId);
+    List<Suggestion> findByOrderIdAndOrderCustomerId(final long orderId , final long customerId , Sort sort);
 
     Suggestion findByOrderIdAndExpertIdAndOrderCustomerId(final long orderId , final long expertId , final long customerId);
+
 }
