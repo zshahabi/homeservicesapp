@@ -12,6 +12,7 @@ import com.homeservices.dto.DTOAddSuggestion;
 import com.homeservices.exception.NotFoundOrderException;
 import com.homeservices.exception.NotFoundSuggestionException;
 import com.homeservices.exception.NotFoundUserException;
+import com.homeservices.exception.TheBidPriceIsLowerThanTheBasePriceException;
 import com.homeservices.exception.ThisExcerptIsNotAnExpertInThisFieldException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -113,7 +114,7 @@ public record SuggestionService(SuggestionRepository repository , ExpertService 
         else throw new NotFoundOrderException(orderId);
     }
 
-    public boolean addSuggestionInSubServiceOrder(final DTOAddSuggestion dtoAddSuggestion , final String subServiceName) throws NotFoundUserException, ThisExcerptIsNotAnExpertInThisFieldException, NotFoundOrderException
+    public boolean addSuggestionInSubServiceOrder(final DTOAddSuggestion dtoAddSuggestion , final String subServiceName) throws NotFoundUserException, ThisExcerptIsNotAnExpertInThisFieldException, NotFoundOrderException, TheBidPriceIsLowerThanTheBasePriceException
     {
         Optional<Experts> byExpertId = expertService.repository().findById(dtoAddSuggestion.getExpert());
         if (byExpertId.isPresent())
@@ -122,16 +123,25 @@ public record SuggestionService(SuggestionRepository repository , ExpertService 
             final Set<SubService> subServices = expert.getSubServices();
 
             boolean ok = false;
+
+            SubService subServiceSelected = null;
+
             for (SubService subService : subServices)
             {
                 if (subService.getName().equals(subServiceName))
                 {
+                    subServiceSelected = subService;
                     ok = true;
                     break;
                 }
             }
 
-            if (ok) return addSuggestion(dtoAddSuggestion);
+            if (ok)
+            {
+                if (dtoAddSuggestion.getPrice() < subServiceSelected.getPrice())
+                    throw new TheBidPriceIsLowerThanTheBasePriceException(subServiceSelected.getPrice() , dtoAddSuggestion.getPrice());
+                else return addSuggestion(dtoAddSuggestion);
+            }
             else throw new ThisExcerptIsNotAnExpertInThisFieldException();
 
         }
