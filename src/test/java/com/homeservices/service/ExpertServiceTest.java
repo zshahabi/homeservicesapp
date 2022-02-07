@@ -8,7 +8,6 @@ import com.homeservices.dto.DTOExpertRegister;
 import com.homeservices.dto.DTORegister;
 import com.homeservices.exception.FoundSubServiceException;
 import com.homeservices.exception.ImageSizeException;
-import com.homeservices.exception.NotFoundOrderException;
 import com.homeservices.exception.NotFoundSubServiceException;
 import com.homeservices.exception.NotFoundUserException;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,20 +100,5 @@ class ExpertServiceTest
     {
         List<Experts> areaOfExpertise = expertService.getExpertByAreaOfExpertise("AreaOfExpertise");
         assertNotNull(areaOfExpertise);
-    }
-
-    @Test
-    void acceptOrder()
-    {
-        try
-        {
-            boolean acceptOrder = expertService.acceptOrder(2 , 7);
-
-            assertTrue(acceptOrder);
-        }
-        catch (NotFoundUserException | NotFoundOrderException e)
-        {
-            e.printStackTrace();
-        }
     }
 }
