@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @ToString
 @RequiredArgsConstructor
 @MappedSuperclass
-public class Users
+public class User
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

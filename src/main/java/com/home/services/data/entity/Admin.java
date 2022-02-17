@@ -12,6 +12,6 @@ import javax.persistence.Table;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "admin")
-public class Admin extends Users
+public class Admin extends User
 {
 }

@@ -15,7 +15,7 @@ import java.util.Set;
 @Setter
 @RequiredArgsConstructor
 @Entity(name = "experts")
-public class Experts extends Users
+public class Expert extends User
 {
     @Lob
     @Column(name = "expert_image")

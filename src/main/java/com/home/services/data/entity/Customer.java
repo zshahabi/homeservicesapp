@@ -12,6 +12,6 @@ import javax.persistence.Table;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "customer")
-public class Customer extends Users
+public class Customer extends User
 {
 }

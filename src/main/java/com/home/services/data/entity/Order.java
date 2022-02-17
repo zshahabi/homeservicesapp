@@ -52,7 +52,7 @@ public class Order
 
     @ManyToOne
     @JoinColumn(name = "expert_id", referencedColumnName = "id")
-    private Experts experts;
+    private Expert expert;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status")
