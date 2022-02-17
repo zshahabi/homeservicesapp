@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/HomeServices.iml" filepath="$PROJECT_DIR$/HomeServices.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HomeService.iml" filepath="$PROJECT_DIR$/HomeService.iml" />
     </modules>
   </component>
 </project>
