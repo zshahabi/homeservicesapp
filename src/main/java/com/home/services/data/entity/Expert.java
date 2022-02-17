@@ -8,13 +8,15 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Entity(name = "experts")
+@Entity
+@Table(name = "expert")
 public class Expert extends User
 {
     @Lob
@@ -22,8 +24,6 @@ public class Expert extends User
     private byte[] img;
 
     private int rating;
-
-    private String areaOfExpertise;
 
     @ManyToMany
     private Set<SubService> subServices = new HashSet<>();
