@@ -34,7 +34,7 @@ public class Order
 
     @ManyToOne
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
-    private Customer customer;
+    private User customer;
 
     private String description;
 
@@ -52,7 +52,7 @@ public class Order
 
     @ManyToOne
     @JoinColumn(name = "expert_id", referencedColumnName = "id")
-    private Expert expert;
+    private User expert;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status")

@@ -1,5 +1,6 @@
 package com.home.services.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 
     private final DataSource dataSource;
 
+    @Autowired
     public SecurityConfig(final DataSource dataSource)
     {
         this.dataSource = dataSource;
@@ -24,18 +26,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     {
         auth.jdbcAuthentication().dataSource(dataSource)
                 .passwordEncoder(new BCryptPasswordEncoder())
-                .usersByUsernameQuery("select email,password,enable from customer customer , Expert expert where customer.email = ? or expert.email = ?")
-                .authoritiesByUsernameQuery("select email,roles from authorities where email = ?");
+                .usersByUsernameQuery("select `email`,`password`,`enable` from `users` where `email` = ?")
+                .authoritiesByUsernameQuery("select `email`,`roles` from `authorities` where `email` = ?");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception
     {
         http.cors().disable()
-                .authorizeRequests().antMatchers("/" , "/register" , "/css/**").permitAll()
+                .authorizeRequests()
+                .antMatchers("/" , "/register" , "/css/**").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin()
-                .loginPage("/users/login").permitAll().and().logout().permitAll();
+                .loginPage("/login").usernameParameter("email").passwordParameter("password").permitAll().and().logout().permitAll();
     }
 
 }

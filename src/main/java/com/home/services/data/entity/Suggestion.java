@@ -30,7 +30,7 @@ public class Suggestion
 
     @ManyToOne
     @JoinColumn(name = "expert_id", referencedColumnName = "id")
-    private Expert expert;
+    private User expert;
 
     private int price;
 

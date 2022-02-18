@@ -1,11 +1,11 @@
 package com.home.services.data.repository;
 
-import com.home.services.data.entity.Expert;
+import com.home.services.data.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ExpertRepository extends JpaRepository<Expert, Long>
+public interface UserRepository extends JpaRepository<User, Long>
 {
-    Expert findByEmail(final String email);
+    User findByEmail(final String email);
 }

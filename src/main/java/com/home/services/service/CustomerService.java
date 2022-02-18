@@ -1,9 +1,9 @@
 package com.home.services.service;
 
-import com.home.services.data.entity.Customer;
+import com.home.services.data.entity.User;
 import com.home.services.data.enums.UserStatus;
 import com.home.services.data.repository.CreateQuerySearchUser;
-import com.home.services.data.repository.CustomerRepository;
+import com.home.services.data.repository.UserRepository;
 import com.home.services.dto.DTOCustomerRegister;
 import com.home.services.dto.DTOSearchUser;
 import com.home.services.dto.mapper.AddressMapper;
@@ -16,20 +16,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public final class CustomerService
+public record CustomerService(UserRepository userRepository ,
+                              CheckEmptyUserInfo checkEmptyUserInfo ,
+                              AddressMapper addressMapper ,
+                              CreateQuerySearchUser createQuerySearchUser)
 {
-    public final CustomerRepository customerRepository;
-    private final CheckEmptyUserInfo checkEmptyUserInfo;
-    private final AddressMapper addressMapper;
-    private final CreateQuerySearchUser createQuerySearchUser;
-
     @Autowired
-    public CustomerService(final CustomerRepository customerRepository , final CheckEmptyUserInfo checkEmptyUserInfo , final AddressMapper addressMapper , final CreateQuerySearchUser createQuerySearchUser)
+    public CustomerService
     {
-        this.customerRepository = customerRepository;
-        this.checkEmptyUserInfo = checkEmptyUserInfo;
-        this.addressMapper = addressMapper;
-        this.createQuerySearchUser = createQuerySearchUser;
     }
 
     public boolean register(final DTOCustomerRegister dtoCustomerRegister) throws InvalidPasswordException, NullPointerException, FoundEmailException
@@ -38,7 +32,7 @@ public final class CustomerService
         {
             if (hasEmail(dtoCustomerRegister.getEmail()))
             {
-                Customer customer = new Customer();
+                User customer = new User();
                 customer.setName(dtoCustomerRegister.getName());
                 customer.setFamily(dtoCustomerRegister.getFamily());
                 customer.setEmail(dtoCustomerRegister.getEmail());
@@ -46,7 +40,7 @@ public final class CustomerService
                 customer.setUserStatus(UserStatus.WAITING_ACCEPT);
                 customer.setAddress(addressMapper.toAddress(dtoCustomerRegister.getAddress()));
 
-                customer = customerRepository.save(customer);
+                customer = userRepository.save(customer);
 
                 return customer.getId() > 0;
             }
@@ -55,16 +49,16 @@ public final class CustomerService
         return false;
     }
 
-    public List<Customer> searchCustomer(final DTOSearchUser dtoSearchUser) throws InvalidUserStatusException
+    public List<User> searchCustomer(final DTOSearchUser dtoSearchUser) throws InvalidUserStatusException
     {
         final List<?> customer = createQuerySearchUser.createQuery("Customer" , dtoSearchUser);
 
-        if (customer != null && customer.size() > 0) return (List<Customer>) customer;
+        if (customer != null && customer.size() > 0) return (List<User>) customer;
         else throw new NullPointerException("Not found customer");
     }
 
     public boolean hasEmail(final String email)
     {
-        return (customerRepository.findByEmail(email) != null);
+        return (userRepository.findByEmail(email) != null);
     }
 }
