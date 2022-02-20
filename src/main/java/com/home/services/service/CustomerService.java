@@ -9,6 +9,7 @@ import com.home.services.dto.DTOSearchUser;
 import com.home.services.dto.mapper.AddressMapper;
 import com.home.services.exception.FoundEmailException;
 import com.home.services.exception.InvalidPasswordException;
+import com.home.services.exception.InvalidPostalCodeException;
 import com.home.services.exception.InvalidUserStatusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public record CustomerService(UserRepository userRepository ,
     {
     }
 
-    public boolean register(final DTOCustomerRegister dtoCustomerRegister) throws InvalidPasswordException, NullPointerException, FoundEmailException
+    public boolean register(final DTOCustomerRegister dtoCustomerRegister) throws InvalidPasswordException, NullPointerException, FoundEmailException, InvalidPostalCodeException
     {
         if (checkEmptyUserInfo.check(dtoCustomerRegister))
         {

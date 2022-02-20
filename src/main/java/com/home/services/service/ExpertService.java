@@ -11,6 +11,7 @@ import com.home.services.dto.mapper.AddressMapper;
 import com.home.services.exception.FoundEmailException;
 import com.home.services.exception.ImageSizeException;
 import com.home.services.exception.InvalidPasswordException;
+import com.home.services.exception.InvalidPostalCodeException;
 import com.home.services.exception.InvalidUserStatusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public record ExpertService(UserRepository expertRepository ,
     {
     }
 
-    public boolean register(final DTOExpertRegister dtoExpertRegister) throws ImageSizeException, FoundEmailException, NullPointerException, InvalidPasswordException
+    public boolean register(final DTOExpertRegister dtoExpertRegister) throws ImageSizeException, FoundEmailException, NullPointerException, InvalidPasswordException, InvalidPostalCodeException
     {
         if (dtoExpertRegister.getImg().length > 0)
             if (dtoExpertRegister.getImg().length > MAX_LEN_IMAGE) throw new ImageSizeException();

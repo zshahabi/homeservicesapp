@@ -15,5 +15,15 @@ public class DTOAddress
     private String alley;
 
     @JsonProperty("postal_code")
-    private int postalCode;
+    private String postalCode;
+
+    @Override
+    public String toString()
+    {
+        return "DTOAddress{" +
+                "street='" + street + '\'' +
+                ", alley='" + alley + '\'' +
+                ", postalCode=" + postalCode +
+                '}';
+    }
 }

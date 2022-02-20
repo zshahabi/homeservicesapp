@@ -55,6 +55,8 @@ public class Order
     @JoinColumn(name = "expert_id", referencedColumnName = "id")
     private User expert;
 
+    private int price;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status")
     private OrderStatus orderStatus;

@@ -1,17 +1,20 @@
 @import "compass/css3";
 
-* {
+*
+{
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-html {
+html
+{
     background: #95a5a6 url(http://subtlepatterns2015.subtlepatterns.netdna-cdn.com/patterns/dark_embroidery.png);
     font-family: 'Helvetica Neue', Arial, Sans-Serif, serif;
 }
 
-html .login-wrap {
+html .login-wrap
+{
     position: relative;
     background: #ecf0f1;
     width: 350px;
@@ -20,7 +23,8 @@ html .login-wrap {
     padding: 15px;
 }
 
-.center {
+.center
+{
     margin: 0;
     position: absolute;
     top: 50%;
@@ -29,7 +33,8 @@ html .login-wrap {
     transform: translate(-50%, -50%);
 }
 
-html .login-wrap h2 {
+html .login-wrap h2
+{
     text-align: center;
     font-weight: 200;
     font-size: 2em;
@@ -37,11 +42,13 @@ html .login-wrap h2 {
     color: #34495e;
 }
 
-html .login-wrap .form {
+html .login-wrap .form
+{
     padding-top: 20px;
 }
 
-html .login-wrap .form input[type="email"], html .login-wrap .form input[type="password"], html .login-wrap .form input[type="submit"] {
+html .login-wrap .form input[type="email"], html .login-wrap .form input[type="password"], html .login-wrap .form input[type="submit"]
+{
     width: 80%;
     margin-left: 10%;
     margin-bottom: 25px;
@@ -51,27 +58,32 @@ html .login-wrap .form input[type="email"], html .login-wrap .form input[type="p
     -moz-outline-style: none;
 }
 
-html .login-wrap .form input[type="email"], html .login-wrap .form input[type="password"] {
+html .login-wrap .form input[type="email"], html .login-wrap .form input[type="password"]
+{
     border: 1px solid #bbb;
     padding: 0 0 0 10px;
     font-size: 14px;
 }
 
-html .login-wrap .form input[type="email"]:focus, html .login-wrap .form input[type="password"]:focus {
+html .login-wrap .form input[type="email"]:focus, html .login-wrap .form input[type="password"]:focus
+{
     border: 1px solid #3498db;
 }
 
-html .login-wrap .form a {
+html .login-wrap .form a
+{
     text-align: center;
     font-size: 10px;
     color: #3498db;
 }
 
-html .login-wrap .form a p {
+html .login-wrap .form a p
+{
     padding-bottom: 10px;
 }
 
-html .login-wrap .form input[type="submit"] {
+html .login-wrap .form input[type="submit"]
+{
     background: #e74c3c;
     border: none;
     color: white;
@@ -81,15 +93,18 @@ html .login-wrap .form input[type="submit"] {
     transition: box-shadow 0.4s ease;
 }
 
-html .login-wrap .form input[type="submit"]:hover {
+html .login-wrap .form input[type="submit"]:hover
+{
     box-shadow: 1px 1px 5px #555;
 }
 
-html .login-wrap .form input[type="submit"]:active {
+html .login-wrap .form input[type="submit"]:active
+{
     box-shadow: 1px 1px 7px #222;
 }
 
-html .login-wrap:after {
+html .login-wrap:after
+{
     content: '';
     position: absolute;
     top: 0;

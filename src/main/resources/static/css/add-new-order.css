@@ -1,0 +1,42 @@
+*, html, body
+{
+    margin: 0;
+    padding: 0;
+}
+
+body
+{
+    background: #cccccc;
+}
+
+.center
+{
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.main
+{
+    margin: 16px;
+    padding: 32px;
+}
+
+.main input
+{
+    margin: 10px;
+}
+
+.main textarea
+{
+    resize: both;
+    width: 350px;
+}
+
+.main select
+{
+    width: 300px;
+}

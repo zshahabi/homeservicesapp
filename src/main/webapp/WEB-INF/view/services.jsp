@@ -7,10 +7,18 @@
     <meta charset="UTF-8">
     <title>Service view</title>
     <link rel="stylesheet" type="text/css" href="/css/services.css">
+
+    <script>
+        const onClickAddNewOrder = () => window.location.href = "/add-new-order";
+    </script>
 </head>
 <body>
 <div id="wrapper">
     <h1>Services</h1>
+
+    <div>
+        <button type="button" onclick="onClickAddNewOrder()" id="add-new-order">Add new order</button>
+    </div>
 
     <table id="keywords">
         <thead>

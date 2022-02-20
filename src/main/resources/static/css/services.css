@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Amarante');
 
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video
+{
     margin: 0;
     padding: 0;
     border: 0;
@@ -15,15 +16,18 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
     box-sizing: border-box;
 }
 
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video
+{
     font-size: 100%;
 }
 
-html {
+html
+{
     overflow-y: scroll;
 }
 
-body {
+body
+{
     background: #eee url('https://i.imgur.com/eeQeRmk.png'); /* https://subtlepatterns.com/weave/ */
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 62.5%;
@@ -33,35 +37,42 @@ body {
     padding-bottom: 55px;
 }
 
-::selection {
+::selection
+{
     background: #5f74a0;
     color: #fff;
 }
 
-::-moz-selection {
+::-moz-selection
+{
     background: #5f74a0;
     color: #fff;
 }
 
-::-webkit-selection {
+::-webkit-selection
+{
     background: #5f74a0;
     color: #fff;
 }
 
-br {
+br
+{
     display: block;
     line-height: 1.6em;
 }
 
-article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section
+{
     display: block;
 }
 
-ol, ul {
+ol, ul
+{
     list-style: none;
 }
 
-input, textarea {
+input, textarea
+{
     -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
@@ -71,30 +82,36 @@ input, textarea {
     outline: none;
 }
 
-blockquote, q {
+blockquote, q
+{
     quotes: none;
 }
 
-blockquote:before, blockquote:after, q:before, q:after {
+blockquote:before, blockquote:after, q:before, q:after
+{
     content: '';
     content: none;
 }
 
-strong, b {
+strong, b
+{
     font-weight: bold;
 }
 
-table {
+table
+{
     border-collapse: collapse;
     border-spacing: 0;
 }
 
-img {
+img
+{
     border: 0;
     max-width: 100%;
 }
 
-h1 {
+h1
+{
     font-family: 'Amarante', Tahoma, sans-serif;
     font-weight: bold;
     font-size: 3.6em;
@@ -105,7 +122,8 @@ h1 {
 
 
 /** page structure **/
-#wrapper {
+#wrapper
+{
     display: block;
     /*width: 850px;*/
     background: #fff;
@@ -114,52 +132,79 @@ h1 {
     -webkit-box-shadow: 2px 2px 3px -1px rgba(0, 0, 0, 0.35);
 }
 
-#keywords {
+#keywords
+{
     margin: 0 auto;
     font-size: 1.2em;
     margin-bottom: 15px;
 }
 
 
-#keywords thead {
+#keywords thead
+{
     cursor: pointer;
     background: #c9dff0;
 }
 
-#keywords thead tr th {
+#keywords thead tr th
+{
     font-weight: bold;
     padding: 12px 30px;
     padding-left: 42px;
 }
 
-#keywords thead tr th span {
+#keywords thead tr th span
+{
     padding-right: 20px;
     background-repeat: no-repeat;
     background-position: 100% 100%;
 }
 
-#keywords thead tr th.headerSortUp, #keywords thead tr th.headerSortDown {
+#keywords thead tr th.headerSortUp, #keywords thead tr th.headerSortDown
+{
     background: #acc8dd;
 }
 
-#keywords thead tr th.headerSortUp span {
+#keywords thead tr th.headerSortUp span
+{
     background-image: url('https://i.imgur.com/SP99ZPJ.png');
 }
 
-#keywords thead tr th.headerSortDown span {
+#keywords thead tr th.headerSortDown span
+{
     background-image: url('https://i.imgur.com/RkA9MBo.png');
 }
 
 
-#keywords tbody tr {
+#keywords tbody tr
+{
     color: #555;
 }
 
-#keywords tbody tr td {
+#keywords tbody tr td
+{
     text-align: center;
     padding: 15px 10px;
 }
 
-#keywords tbody tr td.lalign {
+#keywords tbody tr td.lalign
+{
     text-align: left;
+}
+
+#add-new-order
+{
+    margin: 15px;
+    border: 1px solid #000;
+    background: #000000;
+    color: #ffffff;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#add-new-order:hover
+{
+    background: #ffffff;
+    color: #000000;
 }
