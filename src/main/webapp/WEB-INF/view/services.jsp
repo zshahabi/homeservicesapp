@@ -6,8 +6,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Service view</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
     <link rel="stylesheet" type="text/css" href="/css/services.css">
-
     <script>
         const onClickAddNewOrder = () => window.location.href = "/add-new-order";
     </script>
@@ -17,9 +17,9 @@
     <h1>Services</h1>
 
     <div>
-        <button type="button" onclick="onClickAddNewOrder()" id="add-new-order">Add new order</button>
+        <button type="button" onclick="onClickAddNewOrder()" class="btn btn-outline-primary waves-effect" id="add-new-order">Add new order</button>
     </div>
-
+    <br />
     <table id="keywords">
         <thead>
         <tr>
@@ -49,7 +49,10 @@
                     <td>${order.address.street}</td>
                     <td>${order.description}</td>
                     <td>${order.requestAt.toString()}</td>
-                    <td><a href="/add-suggestion/${order.id}">Add suggestion</a></td>
+                    <td>
+                        <a href="/add-suggestion/${order.id}" class="btn btn-success">Add suggestion</a>
+                        <a href="/show-suggestion/${order.id}" class="btn btn-primary">Show suggestion</a>
+                    </td>
                 </tr>
             </c:forEach>
         </c:if>

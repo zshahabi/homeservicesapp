@@ -192,19 +192,19 @@ h1
     text-align: left;
 }
 
-#add-new-order
-{
-    margin: 15px;
-    border: 1px solid #000;
-    background: #000000;
-    color: #ffffff;
-    padding: 5px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-}
+/*#add-new-order*/
+/*{*/
+/*    margin: 15px;*/
+/*    border: 1px solid #000;*/
+/*    background: #000000;*/
+/*    color: #ffffff;*/
+/*    padding: 5px 15px;*/
+/*    border-radius: 5px;*/
+/*    cursor: pointer;*/
+/*}*/
 
-#add-new-order:hover
-{
-    background: #ffffff;
-    color: #000000;
-}
+/*#add-new-order:hover*/
+/*{*/
+/*    background: #ffffff;*/
+/*    color: #000000;*/
+/*}*/

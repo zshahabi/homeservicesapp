@@ -1,8 +1,10 @@
 package com.home.services.controller;
 
 import com.home.services.data.entity.Order;
+import com.home.services.data.entity.Suggestion;
 import com.home.services.dto.DTOAddOrder;
 import com.home.services.dto.DTOAddSuggestion;
+import com.home.services.dto.mapper.ShowSuggestionMapper;
 import com.home.services.exception.InvalidPostalCodeException;
 import com.home.services.exception.NotFoundOrderException;
 import com.home.services.exception.NotFoundSubServiceException;
@@ -25,7 +27,7 @@ import java.util.Optional;
 @Controller
 @RequestMapping(value = "/")
 public record Views(OrderService orderService , SubServiceService subServiceService ,
-                    SuggestionService suggestionService)
+                    SuggestionService suggestionService , ShowSuggestionMapper showSuggestionMapper)
 {
     @RequestMapping("/login")
     public String login()
@@ -131,5 +133,38 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
         modelMap.put("result" , result);
         return "add-suggestion";
+    }
+
+    @RequestMapping(value = {"/show-suggestion" , "/show-suggestion/{ORDER_ID}"}, method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN" , "EXPERT"})
+    public String showSuggestionOrder(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId)
+    {
+        long orderId = 0;
+        try
+        {
+            orderId = Long.parseLong(strOrderId);
+        }
+        catch (Exception e)
+        {
+            modelMap.put("error" , "Invalid order id");
+        }
+
+        if (orderId > 0)
+        {
+            final long finalOrderId = orderId;
+            (orderService.orderRepository().findById(orderId)).ifPresent(order ->
+            {
+                modelMap.put("orderName" , order.getName());
+                modelMap.put("orderId" , finalOrderId);
+            });
+
+            final List<Suggestion> suggestionOrder = suggestionService.suggestionRepository().findByOrderId(orderId);
+
+            if (suggestionOrder.size() > 0)
+                modelMap.put("showSuggestions" , showSuggestionMapper.toDtoShowSuggestion(suggestionOrder));
+            else modelMap.put("error" , "Not found suggestion");
+        }
+
+        return "show-suggestion";
     }
 }
