@@ -32,6 +32,7 @@
             <th><span>Address</span></th>
             <th><span>Description</span></th>
             <th><span>Requested at</span></th>
+            <th><span>Operation</span></th>
         </tr>
         </thead>
         <tbody>
@@ -48,6 +49,7 @@
                     <td>${order.address.street}</td>
                     <td>${order.description}</td>
                     <td>${order.requestAt.toString()}</td>
+                    <td><a href="/add-suggestion/${order.id}">Add suggestion</a></td>
                 </tr>
             </c:forEach>
         </c:if>
