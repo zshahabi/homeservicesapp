@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.security.RolesAllowed;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(value = "/")
@@ -92,9 +93,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         if (orderId > 0)
         {
             modelMap.put("orderId" , orderId);
-            (orderService.orderRepository().findById(orderId)).ifPresent(order -> modelMap.put("orderName" , order.getName()));
+
+            final Optional<Order> orderFindById = orderService.orderRepository().findById(orderId);
+            orderFindById.ifPresentOrElse(order -> modelMap.put("orderName" , order.getName()) , () -> modelMap.put("error" , "Not found order"));
         }
-        else modelMap.put("error" , "not found order");
 
         return "add-suggestion";
     }
