@@ -22,7 +22,8 @@
         Add order: ${result}
     </div>
 </jstl:if>
-     <h3>Add suggestion [${orderName}]</h3>
+<jstl:if test="${orderName != null}">
+         <h3>Add suggestion [${orderName}]</h3>
   <%--@elvariable id="addSuggestion" type="com.home.services.dto.DTOAddSuggestion"--%>
   <form:form action="/add-suggestion/${orderId}" method="post" modelAttribute="addSuggestion">
      <label>
@@ -42,6 +43,7 @@
       <br />
       <input type="submit" class="btn btn-primary" name="submit" value="Add suggestion" />
   </form:form>
+</jstl:if>
 </div>
 </body>
 </html>
