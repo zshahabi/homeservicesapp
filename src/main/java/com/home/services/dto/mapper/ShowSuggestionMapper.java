@@ -23,7 +23,7 @@ public final class ShowSuggestionMapper
             dtoShowSuggestion.setStartTime(suggestion.getStartTime().toString());
             dtoShowSuggestion.setTimeDo(suggestion.getStartTime().toString());
             dtoShowSuggestion.setExpertId(suggestion.getExpert().getId());
-
+            dtoShowSuggestion.setOrderId(suggestion.getOrder().getId());
             dtoShowSuggestions.add(dtoShowSuggestion);
         }
 

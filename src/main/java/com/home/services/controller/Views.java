@@ -140,23 +140,14 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     @RolesAllowed({"ADMIN" , "EXPERT"})
     public String showSuggestionOrder(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId)
     {
-        long orderId = 0;
-        try
-        {
-            orderId = Long.parseLong(strOrderId);
-        }
-        catch (Exception e)
-        {
-            modelMap.put("error" , "Invalid order id");
-        }
+        final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
 
         if (orderId > 0)
         {
-            final long finalOrderId = orderId;
             (orderService.orderRepository().findById(orderId)).ifPresent(order ->
             {
                 modelMap.put("orderName" , order.getName());
-                modelMap.put("orderId" , finalOrderId);
+                modelMap.put("orderId" , orderId);
             });
 
             final List<Suggestion> suggestionOrder = suggestionService.suggestionRepository().findByOrderId(orderId);
@@ -171,27 +162,11 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = {"/remove-suggestion" , "/remove-suggestion/{EXPERT_ID}/{SUGGESTION_ID}"}, method = RequestMethod.GET)
     @RolesAllowed({"ADMIN" , "EXPERT"})
-    public String removeSuggestion(final ModelMap modelMap , @PathVariable(value = "EXPERT_ID") final String strExpertId , @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
+    public String removeSuggestion(final ModelMap modelMap , @PathVariable(value = "EXPERT_ID") final String strExpertId ,
+                                   @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
     {
-        long expertId = 0;
-        try
-        {
-            expertId = Long.parseLong(strExpertId);
-        }
-        catch (Exception e)
-        {
-            modelMap.put("error" , "Invalid expert id");
-        }
-
-        long suggestionId = 0;
-        try
-        {
-            suggestionId = Long.parseLong(strSuggestionId);
-        }
-        catch (Exception e)
-        {
-            modelMap.put("error" , "Invalid suggestion id");
-        }
+        final long expertId = checkStrId(modelMap , strExpertId , "Invalid expert id");
+        final long suggestionId = checkStrId(modelMap , strSuggestionId , "Invalid suggestion id");
 
         boolean result = false;
         if (expertId > 0 && suggestionId > 0)
@@ -207,7 +182,47 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         }
         modelMap.put("result" , result);
 
-
         return "remove-suggestion";
+    }
+
+    @RequestMapping(value = {"/accept-suggestion" , "/accept-suggestion/{EXPERT_ID}/{ORDER_ID}/{SUGGESTION_ID}"}, method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN" , "EXPERT"})
+    public String acceptSuggestion(final ModelMap modelMap ,
+                                   @PathVariable(value = "EXPERT_ID") final String strExpertId ,
+                                   @PathVariable(value = "ORDER_ID") final String strOrderId ,
+                                   @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
+    {
+        final long expertId = checkStrId(modelMap , strExpertId , "Invalid expert id");
+        final long suggestionId = checkStrId(modelMap , strSuggestionId , "Invalid suggestion id");
+        final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
+
+        boolean result = false;
+        if (expertId > 0 && suggestionId > 0 && orderId > 0)
+        {
+            try
+            {
+                result = orderService.acceptExpert(expertId , orderId , suggestionId);
+            }
+            catch (NotFoundUserException | NotFoundOrderException | NotFoundSuggestionException e)
+            {
+                modelMap.put("error" , e.getMessage());
+            }
+        }
+        modelMap.put("result" , result);
+
+        return "accept-suggestion";
+    }
+
+    private long checkStrId(final ModelMap modelMap , final String strId , final String errorMessage)
+    {
+        try
+        {
+            return Long.parseLong(strId);
+        }
+        catch (Exception e)
+        {
+            modelMap.put("error" , errorMessage);
+        }
+        return 0;
     }
 }
