@@ -10,6 +10,8 @@ import com.home.services.exception.NotFoundOrderException;
 import com.home.services.exception.NotFoundSubServiceException;
 import com.home.services.exception.NotFoundSuggestionException;
 import com.home.services.exception.NotFoundUserException;
+import com.home.services.exception.ThePaymentAmountIsInsufficient;
+import com.home.services.exception.ThisOrderHasBeenPaidException;
 import com.home.services.service.OrderService;
 import com.home.services.service.SubServiceService;
 import com.home.services.service.SuggestionService;
@@ -187,10 +189,7 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = {"/accept-suggestion" , "/accept-suggestion/{EXPERT_ID}/{ORDER_ID}/{SUGGESTION_ID}"}, method = RequestMethod.GET)
     @RolesAllowed({"ADMIN" , "EXPERT"})
-    public String acceptSuggestion(final ModelMap modelMap ,
-                                   @PathVariable(value = "EXPERT_ID") final String strExpertId ,
-                                   @PathVariable(value = "ORDER_ID") final String strOrderId ,
-                                   @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
+    public String acceptSuggestion(final ModelMap modelMap , @PathVariable(value = "EXPERT_ID") final String strExpertId , @PathVariable(value = "ORDER_ID") final String strOrderId , @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
     {
         final long expertId = checkStrId(modelMap , strExpertId , "Invalid expert id");
         final long suggestionId = checkStrId(modelMap , strSuggestionId , "Invalid suggestion id");
@@ -225,4 +224,28 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         }
         return 0;
     }
+
+    @RequestMapping(value = {"/order-payment" , "/order-payment/{ORDER_ID}"}, method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN"})
+    public String acceptSuggestion(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId)
+    {
+        final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
+        if (orderId > 0)
+        {
+            boolean result = false;
+            try
+            {
+                result = orderService.payment(orderId , 0);// price yani key padakht online anjam shode , agar 0 bashe az hesab customer kasr mishe
+            }
+            catch (NotFoundOrderException | NotFoundSuggestionException | ThePaymentAmountIsInsufficient | ThisOrderHasBeenPaidException e)
+            {
+                modelMap.put("error" , e.getMessage());
+            }
+
+            modelMap.put("result" , result);
+        }
+
+        return "order-payment";
+    }
+
 }

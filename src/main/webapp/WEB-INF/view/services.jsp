@@ -52,6 +52,7 @@
                     <td>
                         <a href="/add-suggestion/${order.id}" class="btn btn-success">Add suggestion</a>
                         <a href="/show-suggestion/${order.id}" class="btn btn-primary">Show suggestion</a>
+                        <a href="/order-payment/${order.id}" class="btn btn-info">Payment</a>
                     </td>
                 </tr>
             </jstl:forEach>

@@ -13,14 +13,16 @@ import com.home.services.exception.NotFoundOrderException;
 import com.home.services.exception.NotFoundSubServiceException;
 import com.home.services.exception.NotFoundSuggestionException;
 import com.home.services.exception.NotFoundUserException;
+import com.home.services.exception.ThePaymentAmountIsInsufficient;
+import com.home.services.exception.ThisOrderHasBeenPaidException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public record OrderService(OrderRepository orderRepository , SuggestionService suggestionService ,
-                           ExpertService expertService ,
-                           CustomerService customerService ,
+                           ExpertService expertService , CustomerService customerService ,
                            SubServiceService subServiceService , AddressMapper addressMapper)
 {
     public boolean addOrder(final DTOAddOrder dtoAddOrder) throws NotFoundUserException, NotFoundSubServiceException, InvalidPostalCodeException
@@ -73,6 +75,63 @@ public record OrderService(OrderRepository orderRepository , SuggestionService s
             User expertFindById = expertService().expertRepository().findById(expertId);
             if (expertFindById != null) return new ResultCheckExpertOrderId(orderFindById.get() , expertFindById);
             else throw new NotFoundUserException("expert" , expertId);
+        }
+        else throw new NotFoundOrderException(orderId);
+    }
+
+    public boolean payment(final long orderId , final int price) throws NotFoundOrderException, NotFoundSuggestionException, ThePaymentAmountIsInsufficient, ThisOrderHasBeenPaidException
+    {
+        final Optional<Order> orderFindById = orderRepository.findById(orderId);
+        if (orderFindById.isPresent())
+        {
+            final List<Suggestion> suggestion = suggestionService.suggestionRepository().findByOrderId(orderId);
+
+            if (suggestion != null && suggestion.size() > 0)
+            {
+                final Order order = orderFindById.get();
+                if (!order.getOrderStatus().equals(OrderStatus.PAID))
+                {
+                    final int orderPrice = order.getSubService().getPrice();
+
+                    final int pricePayment = (price == 0) ? order.getCustomer().getAccountCredit() : price;
+
+                    if (pricePayment <= orderPrice)
+                    {
+                        if (price == 0)
+                        {
+                            final User customer = order.getCustomer();
+                            customer.setAccountCredit(pricePayment - orderPrice);
+                            customerService.userRepository().save(customer);
+                        }
+
+                        final User expert = order.getExpert();
+
+                        expert.setAccountCredit(expert.getAccountCredit() + pricePayment);
+                        expertService.expertRepository().save(expert);
+
+                        return changeStatus(orderId , OrderStatus.PAID);
+                    }
+                    else throw new ThePaymentAmountIsInsufficient(orderPrice , pricePayment);
+                }
+                else throw new ThisOrderHasBeenPaidException(order.getName());
+            }
+            else throw new NotFoundSuggestionException();
+        }
+        else throw new NotFoundOrderException(orderId);
+    }
+
+    public boolean changeStatus(final long orderId , final OrderStatus orderStatus) throws NotFoundOrderException
+    {
+        Optional<Order> byOrderId = orderRepository.findById(orderId);
+        if (byOrderId.isPresent())
+        {
+            Order order = byOrderId.get();
+
+            order.setOrderStatus(orderStatus);
+
+            orderRepository.save(order);
+
+            return true;
         }
         else throw new NotFoundOrderException(orderId);
     }
