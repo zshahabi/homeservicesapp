@@ -41,8 +41,8 @@
                     <td>${showSuggestion.startTime}</td>
                     <td>${showSuggestion.expertEmail}</td>
                     <td>
-                        <a href="/accept-suggestion/${showSuggestion.id}" class="btn btn-info">Accept</a>
-                        <a href="/remove-suggestion/${showSuggestion.id}" class="btn btn-danger">Remove</a>
+                        <a href="/accept-suggestion/${showSuggestion.expertId}/${showSuggestion.id}" class="btn btn-info">Accept</a>
+                        <a href="/remove-suggestion/${showSuggestion.expertId}/${showSuggestion.id}" class="btn btn-danger">Remove</a>
                     </td>
                 </tr>
             </jstl:forEach>

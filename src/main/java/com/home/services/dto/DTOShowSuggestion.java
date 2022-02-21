@@ -22,4 +22,5 @@ public final class DTOShowSuggestion
     private String startTime;
 
     private String expertEmail;
+    private long expertId;
 }

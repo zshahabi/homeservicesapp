@@ -8,6 +8,7 @@ import com.home.services.dto.mapper.ShowSuggestionMapper;
 import com.home.services.exception.InvalidPostalCodeException;
 import com.home.services.exception.NotFoundOrderException;
 import com.home.services.exception.NotFoundSubServiceException;
+import com.home.services.exception.NotFoundSuggestionException;
 import com.home.services.exception.NotFoundUserException;
 import com.home.services.service.OrderService;
 import com.home.services.service.SubServiceService;
@@ -166,5 +167,47 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         }
 
         return "show-suggestion";
+    }
+
+    @RequestMapping(value = {"/remove-suggestion" , "/remove-suggestion/{EXPERT_ID}/{SUGGESTION_ID}"}, method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN" , "EXPERT"})
+    public String removeSuggestion(final ModelMap modelMap , @PathVariable(value = "EXPERT_ID") final String strExpertId , @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
+    {
+        long expertId = 0;
+        try
+        {
+            expertId = Long.parseLong(strExpertId);
+        }
+        catch (Exception e)
+        {
+            modelMap.put("error" , "Invalid expert id");
+        }
+
+        long suggestionId = 0;
+        try
+        {
+            suggestionId = Long.parseLong(strSuggestionId);
+        }
+        catch (Exception e)
+        {
+            modelMap.put("error" , "Invalid suggestion id");
+        }
+
+        boolean result = false;
+        if (expertId > 0 && suggestionId > 0)
+        {
+            try
+            {
+                result = suggestionService.removeSuggestion(expertId , suggestionId);
+            }
+            catch (NotFoundSuggestionException | NotFoundUserException e)
+            {
+                modelMap.put("error" , e.getMessage());
+            }
+        }
+        modelMap.put("result" , result);
+
+
+        return "remove-suggestion";
     }
 }

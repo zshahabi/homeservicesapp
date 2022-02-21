@@ -14,6 +14,8 @@ public interface SuggestionRepository extends JpaRepository<Suggestion, Long>
 
     List<Suggestion> findByOrderId(final long orderId);
 
+    Suggestion findByExpertIdAndId(final long expertId , final long suggestionId);
+
     List<Suggestion> findByOrderIdAndOrderCustomerId(final long orderId , final long customerId , Sort sort);
 
     Suggestion findByOrderIdAndExpertIdAndOrderCustomerId(final long orderId , final long expertId , final long customerId);

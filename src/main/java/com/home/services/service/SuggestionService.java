@@ -8,6 +8,8 @@ import com.home.services.data.repository.SuggestionRepository;
 import com.home.services.data.repository.UserRepository;
 import com.home.services.dto.DTOAddSuggestion;
 import com.home.services.exception.NotFoundOrderException;
+import com.home.services.exception.NotFoundSuggestionException;
+import com.home.services.exception.NotFoundUserException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,6 +38,24 @@ public record SuggestionService(SuggestionRepository suggestionRepository , Expe
         }
         else throw new NotFoundOrderException(dtoAddSuggestion.getOrderId());
 
+    }
+
+
+    public boolean removeSuggestion(final long expertId , final long suggestionId) throws NotFoundUserException, NotFoundSuggestionException
+    {
+        final User byExpertId = expertService.expertRepository().findById(expertId);
+        if (byExpertId != null)
+        {
+            final Suggestion suggestion = suggestionRepository.findByExpertIdAndId(expertId , suggestionId);
+            if (suggestion != null)
+            {
+                suggestionRepository.delete(suggestion);
+
+                return true;
+            }
+            else throw new NotFoundSuggestionException();
+        }
+        else throw new NotFoundUserException("expert" , expertId);
     }
 
 }

@@ -1,5 +1,5 @@
 <%@ page import="com.home.services.data.entity.Order" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="jstl" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,8 +37,8 @@
         </thead>
         <tbody>
 
-        <c:if test="${orders.size() > 0}">
-            <c:forEach items="${orders}" var="order">
+        <jstl:if test="${orders.size() > 0}">
+            <jstl:forEach items="${orders}" var="order">
                 <tr>
                     <td class="lalign">${order.id}</td>
                     <td>${order.orderStatus.name()}</td>
@@ -54,8 +54,8 @@
                         <a href="/show-suggestion/${order.id}" class="btn btn-primary">Show suggestion</a>
                     </td>
                 </tr>
-            </c:forEach>
-        </c:if>
+            </jstl:forEach>
+        </jstl:if>
         </tbody>
     </table>
 </div>
