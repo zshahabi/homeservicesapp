@@ -10,12 +10,18 @@ import com.home.services.dto.DTOSearchExpert;
 import com.home.services.dto.mapper.AddressMapper;
 import com.home.services.exception.FoundEmailException;
 import com.home.services.exception.ImageSizeException;
+import com.home.services.exception.InvalidImageException;
 import com.home.services.exception.InvalidPasswordException;
 import com.home.services.exception.InvalidPostalCodeException;
 import com.home.services.exception.InvalidUserStatusException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -31,23 +37,35 @@ public record ExpertService(UserRepository expertRepository ,
     {
     }
 
-    public boolean register(final DTOExpertRegister dtoExpertRegister) throws ImageSizeException, FoundEmailException, NullPointerException, InvalidPasswordException, InvalidPostalCodeException
+    public boolean register(final DTOExpertRegister dtoExpertRegister) throws ImageSizeException, FoundEmailException, NullPointerException, InvalidPasswordException, InvalidPostalCodeException, InvalidImageException
     {
         if (dtoExpertRegister.getImg().length > 0)
             if (dtoExpertRegister.getImg().length > MAX_LEN_IMAGE) throw new ImageSizeException();
 
+        try
+        {
+            final InputStream inputStream = new ByteArrayInputStream(dtoExpertRegister.getImg());
+            ImageIO.read(inputStream);
+        }
+        catch (IOException e)
+        {
+            throw new InvalidImageException();
+        }
+
         if (checkEmptyUserInfo.check(dtoExpertRegister))
         {
-            if (hasEmail(dtoExpertRegister.getEmail()))
+            if (!hasEmail(dtoExpertRegister.getEmail()))
             {
                 User expert = new User();
+
+                expert.getRoles().add(Roles.EXPERT);
+
                 expert.setName(dtoExpertRegister.getName());
                 expert.setFamily(dtoExpertRegister.getFamily());
                 expert.setEmail(dtoExpertRegister.getEmail());
-                expert.setPassword(dtoExpertRegister.getPassword());
+                expert.setPassword(new BCryptPasswordEncoder().encode(dtoExpertRegister.getPassword()));
                 expert.setUserStatus(UserStatus.WAITING_ACCEPT);
-                expert.getRoles().add(Roles.ADMIN);
-                expert.setAddress(addressMapper.toAddress(dtoExpertRegister.getAddress()));
+                expert.setAddress(addressMapper.toAddress(dtoExpertRegister));
 
                 expert.setImg(dtoExpertRegister.getImg());
 

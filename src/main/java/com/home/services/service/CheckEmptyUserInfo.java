@@ -18,16 +18,17 @@ public final class CheckEmptyUserInfo
                 {
                     if (Str.notEmpty(user.getPassword()))
                     {
-                        if (user.getPassword().matches("^(?=.*\\\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$"))
-                            return true;
-                        else throw new InvalidPasswordException();
+                        return true;
+//                        if (user.getPassword().matches("^(?=.*\\\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$"))
+//                            return true;
+//                        else throw new InvalidPasswordException();
                     }
-                    else throw new NullPointerException("password");
+                    else throw new NullPointerException("Password is null");
                 }
-                else throw new NullPointerException("family");
+                else throw new NullPointerException("Family is null");
             }
-            else throw new NullPointerException("email");
+            else throw new NullPointerException("Email is null");
         }
-        else throw new NullPointerException("name");
+        else throw new NullPointerException("Name is null");
     }
 }

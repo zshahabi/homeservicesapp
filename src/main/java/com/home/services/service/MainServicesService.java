@@ -3,6 +3,7 @@ package com.home.services.service;
 import com.home.services.data.entity.MainService;
 import com.home.services.data.repository.MainServiceRepository;
 import com.home.services.exception.FoundMainServiceException;
+import com.home.services.other.Str;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,18 +31,22 @@ public record MainServicesService(MainServiceRepository repository)
         }
     }
 
-    public boolean addCustomMainService(final String name) throws FoundMainServiceException
+    public boolean addCustomMainService(final String name) throws FoundMainServiceException, NullPointerException
     {
-        final MainService byName = repository.findByName(name);
-        if (byName == null)
+        if (Str.notEmpty(name))
         {
-            final MainService mainService = new MainService();
-            mainService.setName(name);
-            repository.save(mainService);
+            final MainService byName = repository.findByName(name);
+            if (byName == null)
+            {
+                final MainService mainService = new MainService();
+                mainService.setName(name);
+                repository.save(mainService);
 
-            return true;
+                return true;
+            }
+            else throw new FoundMainServiceException(name);
         }
-        else throw new FoundMainServiceException(name);
+        else throw new NullPointerException("Name is empty!");
     }
 
     public List<MainService> mainServices()

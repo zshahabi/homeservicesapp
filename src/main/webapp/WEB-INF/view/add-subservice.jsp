@@ -44,7 +44,7 @@
                       <option value="${mainService.id}">${mainService.name}</option>
                   </jstl:forEach>
               </select>
-              <input type="submit" class="btn btn-primary" name="submit" value="Add suggestion" />
+              <input type="submit" class="btn btn-primary" name="submit" value="Add subservice" />
         </form:form>
   </jstl:if>
 <jstl:if test="${mainServices == null}">

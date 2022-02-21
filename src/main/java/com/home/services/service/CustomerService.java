@@ -1,6 +1,7 @@
 package com.home.services.service;
 
 import com.home.services.data.entity.User;
+import com.home.services.data.enums.Roles;
 import com.home.services.data.enums.UserStatus;
 import com.home.services.data.repository.CreateQuerySearchUser;
 import com.home.services.data.repository.UserRepository;
@@ -12,6 +13,7 @@ import com.home.services.exception.InvalidPasswordException;
 import com.home.services.exception.InvalidPostalCodeException;
 import com.home.services.exception.InvalidUserStatusException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,15 +33,18 @@ public record CustomerService(UserRepository userRepository ,
     {
         if (checkEmptyUserInfo.check(dtoCustomerRegister))
         {
-            if (hasEmail(dtoCustomerRegister.getEmail()))
+            if (!hasEmail(dtoCustomerRegister.getEmail()))
             {
                 User customer = new User();
+
+                customer.getRoles().add(Roles.CUSTOMER);
+
                 customer.setName(dtoCustomerRegister.getName());
                 customer.setFamily(dtoCustomerRegister.getFamily());
                 customer.setEmail(dtoCustomerRegister.getEmail());
-                customer.setPassword(dtoCustomerRegister.getPassword());
+                customer.setPassword(new BCryptPasswordEncoder().encode(dtoCustomerRegister.getPassword()));
                 customer.setUserStatus(UserStatus.WAITING_ACCEPT);
-                customer.setAddress(addressMapper.toAddress(dtoCustomerRegister.getAddress()));
+                customer.setAddress(addressMapper.toAddress(dtoCustomerRegister));
 
                 customer = userRepository.save(customer);
 

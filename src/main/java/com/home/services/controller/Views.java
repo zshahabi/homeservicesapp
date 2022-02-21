@@ -2,13 +2,21 @@ package com.home.services.controller;
 
 import com.home.services.data.entity.Order;
 import com.home.services.data.entity.Suggestion;
+import com.home.services.data.enums.UserType;
 import com.home.services.dto.DTOAddOrder;
 import com.home.services.dto.DTOAddSubService;
 import com.home.services.dto.DTOAddSuggestion;
+import com.home.services.dto.DTOCustomerRegister;
+import com.home.services.dto.DTOExpertRegister;
 import com.home.services.dto.mapper.MainServiceForAddSubServiceMapper;
 import com.home.services.dto.mapper.ShowSuggestionMapper;
+import com.home.services.exception.FoundEmailException;
+import com.home.services.exception.FoundMainServiceException;
 import com.home.services.exception.FoundSubServiceException;
+import com.home.services.exception.ImageSizeException;
 import com.home.services.exception.InvalidIdException;
+import com.home.services.exception.InvalidImageException;
+import com.home.services.exception.InvalidPasswordException;
 import com.home.services.exception.InvalidPostalCodeException;
 import com.home.services.exception.InvalidPriceException;
 import com.home.services.exception.NotFoundOrderException;
@@ -17,6 +25,9 @@ import com.home.services.exception.NotFoundSuggestionException;
 import com.home.services.exception.NotFoundUserException;
 import com.home.services.exception.ThePaymentAmountIsInsufficient;
 import com.home.services.exception.ThisOrderHasBeenPaidException;
+import com.home.services.other.Str;
+import com.home.services.service.CustomerService;
+import com.home.services.service.ExpertService;
 import com.home.services.service.MainServicesService;
 import com.home.services.service.OrderService;
 import com.home.services.service.SubServiceService;
@@ -28,9 +39,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.RolesAllowed;
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Controller
@@ -38,7 +53,8 @@ import java.util.Optional;
 public record Views(OrderService orderService , SubServiceService subServiceService ,
                     SuggestionService suggestionService , ShowSuggestionMapper showSuggestionMapper ,
                     MainServicesService mainServicesService ,
-                    MainServiceForAddSubServiceMapper mainServiceForAddSubServiceMapper)
+                    MainServiceForAddSubServiceMapper mainServiceForAddSubServiceMapper , ExpertService expertService ,
+                    CustomerService customerService)
 {
     @RequestMapping("/login")
     public String login()
@@ -284,4 +300,118 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
         return "add-subservice";
     }
+
+
+    @RequestMapping(value = "/add-main-service", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN"})
+    public String addMainService()
+    {
+        return "add-main-service";
+    }
+
+    @RequestMapping(value = "/add-main-service", method = RequestMethod.POST)
+    @RolesAllowed({"ADMIN"})
+    public String addMainService(final ModelMap modelMap , @RequestParam(value = "name") final String name)
+    {
+        boolean result = false;
+        try
+        {
+            result = mainServicesService.addCustomMainService(name);
+        }
+        catch (FoundMainServiceException | NullPointerException e)
+        {
+            modelMap.put("error" , e.getMessage());
+        }
+
+        modelMap.put("result" , result);
+
+        return "add-main-service";
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public String register()
+    {
+        return "register";
+    }
+
+    @RequestMapping(value = "/register-expert", method = RequestMethod.POST)
+    public String register(final ModelMap modelMap , @ModelAttribute("addNewUser") final DTOExpertRegister dtoRegister)
+    {
+        final UserType userType = cheUserTypeRegister(modelMap , dtoRegister.getUserType());
+
+        boolean result = false;
+        if (userType != null)
+        {
+            if (userType.equals(UserType.EXPERT))
+            {
+                try
+                {
+
+                    final MultipartFile image = dtoRegister.getImage();
+
+                    if (image != null)
+                    {
+                        dtoRegister.setImg(image.getBytes());
+
+                        result = expertService.register(dtoRegister);
+                    }
+                    else modelMap.put("error" , "Image is null");
+                }
+                catch (ImageSizeException | NullPointerException | FoundEmailException | InvalidPasswordException | InvalidPostalCodeException | IOException | InvalidImageException e)
+                {
+                    if (e instanceof IOException) modelMap.put("error" , "Image is invalid!");
+                    else modelMap.put("error" , e.getMessage());
+                }
+            }
+            else modelMap.put("error" , "Invalid user type");
+        }
+
+        modelMap.put("result" , result);
+
+        return "register";
+    }
+
+    @RequestMapping(value = "/register-customer", method = RequestMethod.POST)
+    public String register(final ModelMap modelMap , @ModelAttribute("addNewUser") final DTOCustomerRegister dtoRegister)
+    {
+        final UserType userType = cheUserTypeRegister(modelMap , dtoRegister.getUserType());
+
+        boolean result = false;
+        if (userType != null)
+        {
+            if (userType.equals(UserType.CUSTOMER))
+            {
+                try
+                {
+                    result = customerService.register(dtoRegister);
+                }
+                catch (FoundEmailException | InvalidPasswordException | NullPointerException | InvalidPostalCodeException e)
+                {
+                    modelMap.put("error" , e.getMessage());
+                }
+            }
+            else modelMap.put("error" , "Invalid user type");
+        }
+
+        modelMap.put("result" , result);
+
+        return "register";
+    }
+
+    private UserType cheUserTypeRegister(final ModelMap modelMap , final String userTypeStr)
+    {
+        try
+        {
+            if (Str.notEmpty(userTypeStr) && !userTypeStr.toUpperCase(Locale.ROOT).equals("ADMIN"))
+                return UserType.valueOf(userTypeStr.toUpperCase(Locale.ROOT));
+            else throw new Exception();
+        }
+        catch (Exception e)
+        {
+            modelMap.put("error" , "Invalid user type");
+        }
+
+        return null;
+    }
+
 }
