@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="/css/services.css">
     <script>
         const onClickAddNewOrder = () => window.location.href = "/add-new-order";
+        const onClickAddSubService = () => window.location.href = "/add-subservice";
     </script>
 </head>
 <body>
@@ -18,6 +19,7 @@
 
     <div>
         <button type="button" onclick="onClickAddNewOrder()" class="btn btn-outline-primary waves-effect" id="add-new-order">Add new order</button>
+        <button type="button" onclick="onClickAddSubService()" class="btn btn-outline-primary waves-effect" id="add-sub-service">Add sub service</button>
     </div>
     <br />
     <table id="keywords">

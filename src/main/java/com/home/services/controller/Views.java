@@ -3,15 +3,21 @@ package com.home.services.controller;
 import com.home.services.data.entity.Order;
 import com.home.services.data.entity.Suggestion;
 import com.home.services.dto.DTOAddOrder;
+import com.home.services.dto.DTOAddSubService;
 import com.home.services.dto.DTOAddSuggestion;
+import com.home.services.dto.mapper.MainServiceForAddSubServiceMapper;
 import com.home.services.dto.mapper.ShowSuggestionMapper;
+import com.home.services.exception.FoundSubServiceException;
+import com.home.services.exception.InvalidIdException;
 import com.home.services.exception.InvalidPostalCodeException;
+import com.home.services.exception.InvalidPriceException;
 import com.home.services.exception.NotFoundOrderException;
 import com.home.services.exception.NotFoundSubServiceException;
 import com.home.services.exception.NotFoundSuggestionException;
 import com.home.services.exception.NotFoundUserException;
 import com.home.services.exception.ThePaymentAmountIsInsufficient;
 import com.home.services.exception.ThisOrderHasBeenPaidException;
+import com.home.services.service.MainServicesService;
 import com.home.services.service.OrderService;
 import com.home.services.service.SubServiceService;
 import com.home.services.service.SuggestionService;
@@ -30,7 +36,9 @@ import java.util.Optional;
 @Controller
 @RequestMapping(value = "/")
 public record Views(OrderService orderService , SubServiceService subServiceService ,
-                    SuggestionService suggestionService , ShowSuggestionMapper showSuggestionMapper)
+                    SuggestionService suggestionService , ShowSuggestionMapper showSuggestionMapper ,
+                    MainServicesService mainServicesService ,
+                    MainServiceForAddSubServiceMapper mainServiceForAddSubServiceMapper)
 {
     @RequestMapping("/login")
     public String login()
@@ -164,8 +172,7 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = {"/remove-suggestion" , "/remove-suggestion/{EXPERT_ID}/{SUGGESTION_ID}"}, method = RequestMethod.GET)
     @RolesAllowed({"ADMIN" , "EXPERT"})
-    public String removeSuggestion(final ModelMap modelMap , @PathVariable(value = "EXPERT_ID") final String strExpertId ,
-                                   @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
+    public String removeSuggestion(final ModelMap modelMap , @PathVariable(value = "EXPERT_ID") final String strExpertId , @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
     {
         final long expertId = checkStrId(modelMap , strExpertId , "Invalid expert id");
         final long suggestionId = checkStrId(modelMap , strSuggestionId , "Invalid suggestion id");
@@ -248,4 +255,33 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         return "order-payment";
     }
 
+    @RequestMapping(value = "/add-subservice", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN"})
+    public String addSubService(final ModelMap modelMap)
+    {
+        modelMap.put("mainServices" , mainServiceForAddSubServiceMapper.toDtoMainServiceForAddSubServices(mainServicesService.mainServices()));
+
+        return "add-subservice";
+    }
+
+    @RequestMapping(value = "/add-subservice", method = RequestMethod.POST)
+    @RolesAllowed({"ADMIN"})
+    public String addSubService(final ModelMap modelMap , @ModelAttribute("addSubService") final DTOAddSubService dtoAddSubService)
+    {
+        modelMap.put("mainServices" , mainServiceForAddSubServiceMapper.toDtoMainServiceForAddSubServices(mainServicesService.mainServices()));
+
+        boolean result = false;
+        try
+        {
+            result = subServiceService.addNewSubService(dtoAddSubService);
+        }
+        catch (InvalidIdException | InvalidPriceException | FoundSubServiceException e)
+        {
+            modelMap.put("error" , e.getMessage());
+        }
+
+        modelMap.put("result" , result);
+
+        return "add-subservice";
+    }
 }
