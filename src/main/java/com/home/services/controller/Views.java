@@ -2,7 +2,10 @@ package com.home.services.controller;
 
 import com.home.services.data.entity.Order;
 import com.home.services.data.entity.Suggestion;
-import com.home.services.data.enums.UserType;
+import com.home.services.data.entity.User;
+import com.home.services.data.enums.Roles;
+import com.home.services.data.enums.UserStatus;
+import com.home.services.data.repository.UserRepository;
 import com.home.services.dto.DTOAddOrder;
 import com.home.services.dto.DTOAddSubService;
 import com.home.services.dto.DTOAddSuggestion;
@@ -10,6 +13,7 @@ import com.home.services.dto.DTOCustomerRegister;
 import com.home.services.dto.DTOExpertRegister;
 import com.home.services.dto.mapper.MainServiceForAddSubServiceMapper;
 import com.home.services.dto.mapper.ShowSuggestionMapper;
+import com.home.services.dto.mapper.UsersMapper;
 import com.home.services.exception.FoundEmailException;
 import com.home.services.exception.FoundMainServiceException;
 import com.home.services.exception.FoundSubServiceException;
@@ -54,7 +58,7 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
                     SuggestionService suggestionService , ShowSuggestionMapper showSuggestionMapper ,
                     MainServicesService mainServicesService ,
                     MainServiceForAddSubServiceMapper mainServiceForAddSubServiceMapper , ExpertService expertService ,
-                    CustomerService customerService)
+                    CustomerService customerService , UsersMapper usersMapper)
 {
     @RequestMapping("/login")
     public String login()
@@ -337,12 +341,12 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     @RequestMapping(value = "/register-expert", method = RequestMethod.POST)
     public String register(final ModelMap modelMap , @ModelAttribute("addNewUser") final DTOExpertRegister dtoRegister)
     {
-        final UserType userType = cheUserTypeRegister(modelMap , dtoRegister.getUserType());
+        final Roles role = cheUserTypeRegister(modelMap , dtoRegister.getUserType());
 
         boolean result = false;
-        if (userType != null)
+        if (role != null)
         {
-            if (userType.equals(UserType.EXPERT))
+            if (role.equals(Roles.EXPERT))
             {
                 try
                 {
@@ -374,12 +378,12 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     @RequestMapping(value = "/register-customer", method = RequestMethod.POST)
     public String register(final ModelMap modelMap , @ModelAttribute("addNewUser") final DTOCustomerRegister dtoRegister)
     {
-        final UserType userType = cheUserTypeRegister(modelMap , dtoRegister.getUserType());
+        final Roles role = cheUserTypeRegister(modelMap , dtoRegister.getUserType());
 
         boolean result = false;
-        if (userType != null)
+        if (role != null)
         {
-            if (userType.equals(UserType.CUSTOMER))
+            if (role.equals(Roles.CUSTOMER))
             {
                 try
                 {
@@ -398,12 +402,12 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         return "register";
     }
 
-    private UserType cheUserTypeRegister(final ModelMap modelMap , final String userTypeStr)
+    private Roles cheUserTypeRegister(final ModelMap modelMap , final String userTypeStr)
     {
         try
         {
             if (Str.notEmpty(userTypeStr) && !userTypeStr.toUpperCase(Locale.ROOT).equals("ADMIN"))
-                return UserType.valueOf(userTypeStr.toUpperCase(Locale.ROOT));
+                return Roles.valueOf(userTypeStr.toUpperCase(Locale.ROOT));
             else throw new Exception();
         }
         catch (Exception e)
@@ -414,4 +418,82 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         return null;
     }
 
+    @RequestMapping(value = "/users/{ROLE}", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN"})
+    public String users(final ModelMap modelMap , @PathVariable(value = "ROLE") final String roleStr)
+    {
+        final Roles role = cheUserTypeRegister(modelMap , roleStr);
+        if (role != null)
+        {
+            modelMap.put("role" , role.name().toLowerCase(Locale.ROOT));
+
+            List<User> users = null;
+
+            if (role.equals(Roles.EXPERT)) users = expertService.expertRepository().findByRolesContains(Roles.EXPERT);
+            else if (role.equals(Roles.CUSTOMER))
+                users = customerService.userRepository().findByRolesContains(Roles.CUSTOMER);
+            else modelMap.put("error" , "Invalid role");
+
+            if (users != null && users.size() > 0) modelMap.put("users" , usersMapper.toDtoUsers(users));
+        }
+
+        return "users";
+    }
+
+    @RequestMapping(value = "/accept-user/{USER_ID}", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN"})
+    public String acceptUser(final ModelMap modelMap , @PathVariable(value = "USER_ID") final String strUserId)
+    {
+        final long userId = checkStrId(modelMap , strUserId , "Invalid user id");
+
+        boolean result = false;
+        if (userId > 0)
+        {
+            final UserRepository userRepository = customerService.userRepository();
+
+            final User userFindById = userRepository.findById(userId);
+
+            if (userFindById != null)
+            {
+                if (!userFindById.getUserStatus().equals(UserStatus.ACCEPTED))
+                    result = userRepository.changeUserStatus(UserStatus.ACCEPTED , userId) > 0;
+                else modelMap.put("error" , "This user is accepted");
+            }
+            else modelMap.put("error" , "Invalid user id");
+        }
+
+        modelMap.put("result" , result);
+
+        modelMap.put("operationName" , "Accept user");
+
+        return "operation-users";
+    }
+
+    @RequestMapping(value = "/remove-user/{USER_ID}", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN"})
+    public String removeUser(final ModelMap modelMap , @PathVariable(value = "USER_ID") final String strUserId)
+    {
+        final long userId = checkStrId(modelMap , strUserId , "Invalid user id");
+
+        boolean result = false;
+        if (userId > 0)
+        {
+            final UserRepository userRepository = customerService.userRepository();
+
+            final User userFindById = userRepository.findById(userId);
+
+            if (userFindById != null)
+            {
+                userRepository.delete(userFindById);
+                result = true;
+            }
+            else modelMap.put("error" , "Invalid user id");
+        }
+
+        modelMap.put("result" , result);
+
+        modelMap.put("operationName" , "Remove user");
+
+        return "operation-users";
+    }
 }

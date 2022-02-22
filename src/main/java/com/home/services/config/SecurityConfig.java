@@ -33,10 +33,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
         http.cors().disable()
                 .authorizeRequests().antMatchers("/" , "/register" , "/css/**")
                 .permitAll()
+
                 .antMatchers("/add-suggestion/**").hasAuthority("EXPERT")
                 .antMatchers("/add-main-service").hasAuthority("ADMIN")
                 .antMatchers("/add-subservice").hasAuthority("ADMIN")
+                .antMatchers("/users" , "/users/**").hasAuthority("ADMIN")
+                .antMatchers("/edit-user" , "/edit-user/**").hasAuthority("ADMIN")
+                .antMatchers("/remove-user" , "/remove-user/**").hasAuthority("ADMIN")
+                .antMatchers("/accept-user" , "/accept-user/**").hasAuthority("ADMIN")
                 .antMatchers("/order-payment" , "/order-payment/**").hasAuthority("ADMIN")
+
                 .anyRequest().authenticated()
                 .and().formLogin().loginPage("/login").usernameParameter("email").passwordParameter("password").permitAll()
                 .and().logout().permitAll();
