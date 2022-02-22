@@ -38,9 +38,11 @@
                     <td>${comment.user}</td>
                     <td>${comment.text}</td>
                     <td>${comment.createdAt}</td>
-                    <td>
-                        <a href="/remove-comment/${comment.id}" class="btn btn-danger">Remove</a>
-                    </td>
+                    <jstl:if test="${comment.role == 'admin' || comment.role == 'expert' || loggedEmail == comment.user}">
+                        <td>
+                            <a href="/remove-comment/${comment.id}" class="btn btn-danger">Remove</a>
+                        </td>
+                    </jstl:if>
                 </tr>
             </jstl:forEach>
         </jstl:if>

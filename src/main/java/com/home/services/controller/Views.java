@@ -610,6 +610,7 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
             modelMap.put("comments" , commentsMapper.toDtoComments(comments));
 
             final Order order = orderFindById.get();
+            modelMap.put("loggedEmail" , authentication.getName());
             modelMap.put("orderName" , order.getName());
             modelMap.put("orderId" , order.getId());
         }

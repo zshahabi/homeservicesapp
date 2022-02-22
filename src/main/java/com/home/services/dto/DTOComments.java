@@ -13,4 +13,5 @@ public final class DTOComments
     private String user;
     private String text;
     private String createdAt;
+    private String role;
 }
