@@ -4,7 +4,7 @@
 <html>
 <head>
     <title>Login page</title>
-    <link href="/css/home.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/home.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div class="login-wrap center">
@@ -12,12 +12,12 @@
 
     <div class="form">
         <form action="/login" method="post">
-            <input type="email" placeholder="Email" name="email"/>
-            <input type="password" placeholder="Password" name="password"/>
-            <input type="submit" value="Sign in" name="submit"/>
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <input type="email" placeholder="Email" name="email" />
+            <input type="password" placeholder="Password" name="password" />
+            <input type="submit" value="Sign in" name="submit" />
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
         </form>
-        <a href="#"><p> Don't have an account? Register </p></a>
+        <a href="/register"><p> Don't have an account? Register </p></a>
     </div>
 </div>
 </body>

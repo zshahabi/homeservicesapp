@@ -62,6 +62,12 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
                     MainServiceForAddSubServiceMapper mainServiceForAddSubServiceMapper , ExpertService expertService ,
                     CustomerService customerService , UsersMapper usersMapper)
 {
+    @RequestMapping(value = {"/" , "/home" , "/index"}, method = RequestMethod.GET)
+    public String index()
+    {
+        return "index";
+    }
+
     @RequestMapping("/login")
     public String login()
     {
