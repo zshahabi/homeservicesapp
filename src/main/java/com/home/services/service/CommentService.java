@@ -3,8 +3,11 @@ package com.home.services.service;
 import com.home.services.data.entity.Comments;
 import com.home.services.data.entity.Order;
 import com.home.services.data.entity.User;
+import com.home.services.data.enums.Roles;
 import com.home.services.data.repository.CommentRepository;
+import com.home.services.data.repository.UserRepository;
 import com.home.services.exception.NotFoundOrderException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,26 +17,41 @@ import java.util.Optional;
 public record CommentService(CommentRepository commentRepository , OrderService orderService)
 {
 
-    public boolean addComment(final long orderId , final String comment) throws NotFoundOrderException
+    public boolean addComment(final long orderId , final String email , final String comment) throws NotFoundOrderException
     {
         final Optional<Order> orderFindById = orderService.orderRepository().findById(orderId);
         if (orderFindById.isPresent())
         {
             final Order order = orderFindById.get();
 
-            final User customer = order.getCustomer();
+            final UserRepository userRepository = orderService.customerService().userRepository();
 
-            Comments comments = new Comments();
-            comments.setComment(comment);
-            comments.setUser(customer);
-            comments.setOrder(order);
+            final User userFindByEmail = userRepository.findByEmail(email);
 
-            comments = commentRepository.save(comments);
+            final Roles role = userFindByEmail.getRoles().get(0);
 
-            return comments.getId() > 0;
-
+            if (role.equals(Roles.ADMIN) || role.equals(Roles.EXPERT))
+                return addComment(comment , userFindByEmail , order);
+            else
+            {
+                if (order.getCustomer().getEmail().equals(email))
+                    return addComment(comment , userFindByEmail , order);
+                else throw new AccessDeniedException("You do not have access to this order");
+            }
         }
         else throw new NotFoundOrderException(orderId);
+    }
+
+    private boolean addComment(final String textComment , final User user , final Order order)
+    {
+        Comments comments = new Comments();
+        comments.setComment(textComment);
+        comments.setUser(user);
+        comments.setOrder(order);
+
+        comments = commentRepository.save(comments);
+
+        return comments.getId() > 0;
     }
 
     public List<Comments> getCommentsByOrder(final long orderId)

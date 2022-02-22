@@ -41,6 +41,7 @@ import com.home.services.service.MainServicesService;
 import com.home.services.service.OrderService;
 import com.home.services.service.SubServiceService;
 import com.home.services.service.SuggestionService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -59,6 +60,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Controller
 @RequestMapping(value = "/")
@@ -640,5 +642,54 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         modelMap.put("result" , result);
 
         return "operation-users";
+    }
+
+    @RequestMapping(value = "/add-comment/{ORDER_ID}", method = RequestMethod.GET)
+    public String addComment(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId)
+    {
+        final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
+
+        if (orderId > 0)
+        {
+            final Optional<Order> orderFindById = orderService.orderRepository().findById(orderId);
+            orderFindById.ifPresentOrElse(order -> modelMap.put("orderName" , order.getName()) , () -> modelMap.put("error" , "Invalid order id"));
+
+            modelMap.put("orderId" , orderId);
+        }
+
+        return "add-comment";
+    }
+
+    @RequestMapping(value = "/add-comment/{ORDER_ID}", method = RequestMethod.POST)
+    public String addComment(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId , @RequestParam("textComment") final String textComment , final Authentication authentication)
+    {
+        final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
+
+        final AtomicBoolean result = new AtomicBoolean(false);
+
+        if (orderId > 0)
+        {
+            final Optional<Order> orderFindById = orderService.orderRepository().findById(orderId);
+            orderFindById.ifPresentOrElse(order ->
+            {
+                modelMap.put("orderName" , order.getName());
+
+                try
+                {
+                    result.set(commentService.addComment(orderId , authentication.getName() , textComment));
+                }
+                catch (NotFoundOrderException | AccessDeniedException e)
+                {
+                    modelMap.put("error" , e.getMessage());
+                }
+
+            } , () -> modelMap.put("error" , "Invalid order id"));
+
+            modelMap.put("orderId" , orderId);
+        }
+
+        modelMap.put("result" , result.get());
+
+        return "add-comment";
     }
 }

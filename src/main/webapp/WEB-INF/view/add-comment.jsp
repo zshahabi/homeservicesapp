@@ -19,30 +19,19 @@
 <jstl:if test="${result != null}">
     <jstl:if test="${result}"> <div class="alert alert-success" role="alert"></jstl:if>
     <jstl:if test="${!result}"> <div class="alert alert-danger" role="alert"></jstl:if>
-        Add Suggestion: ${result}
+        Add Comment: ${result}
     </div>
 </jstl:if>
 <jstl:if test="${orderName != null}">
-         <h3>Add suggestion [${orderName}]</h3>
-  <%--@elvariable id="addSuggestion" type="com.home.services.dto.DTOAddSuggestion"--%>
-  <form:form action="/add-suggestion/${orderId}" method="post" modelAttribute="addSuggestion">
+         <h3>Add comment [${orderName}]</h3>
+    <%--@elvariable id="textComment" type="java.lang.String"--%>
+    <form:form action="/add-comment/${orderId}" method="post" modelAttribute="textComment">
      <label>
-           <input type="text" class="form-control" name="price" placeholder="Price" />
+           <textarea class="form-control" name="textComment" placeholder="Your comment" rows="5"></textarea>
      </label>
      <br />
-     <label>
-           <textarea class="form-control" name="suggestion" placeholder="Suggestion" rows="5"></textarea>
-     </label>
-      <br />
-      <label>
-           <input type="text" class="form-control" name="startTime" placeholder="Start time" />
-      </label>
-      <label>
-           <input type="text" class="form-control" name="timeDo" placeholder="Time do" />
-      </label>
-      <br />
-      <input type="submit" class="btn btn-primary" name="submit" value="Add suggestion" />
-  </form:form>
+      <input type="submit" class="btn btn-primary" name="submit" value="Add commit" />
+   </form:form>
 </jstl:if>
 </div>
 </body>
