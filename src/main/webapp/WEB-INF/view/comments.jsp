@@ -14,7 +14,11 @@
 <body>
 <div id="wrapper">
     <h1>Comments [${orderName}]</h1>
-
+<jstl:if test="${error != null}">
+    <div class="alert alert-danger" role="alert">
+            ${error}
+    </div>
+ </jstl:if>
     <div>
         <button type="button" onclick="onClickAddNewOrder()" class="btn btn-outline-primary waves-effect" id="add-new-order">Add new comment</button>
     </div>

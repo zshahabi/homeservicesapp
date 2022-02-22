@@ -596,25 +596,28 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     {
         final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
 
-        final Optional<Order> orderFindById = orderService.orderRepository().findById(orderId);
-
-        if (orderFindById.isPresent())
+        if (orderId > 0)
         {
-            final List<Comments> comments;
+            final Optional<Order> orderFindById = orderService.orderRepository().findById(orderId);
 
-            if (hasRole(authentication.getAuthorities() , Roles.ADMIN) != null || hasRole(authentication.getAuthorities() , Roles.EXPERT) != null)
-                comments = commentService.getCommentsByOrder(orderId);
-            else
-                comments = commentService.getCommentsByUser(authentication.getName());
+            if (orderFindById.isPresent())
+            {
+                final List<Comments> comments;
 
-            modelMap.put("comments" , commentsMapper.toDtoComments(comments));
+                if (hasRole(authentication.getAuthorities() , Roles.ADMIN) != null || hasRole(authentication.getAuthorities() , Roles.EXPERT) != null)
+                    comments = commentService.getCommentsByOrder(orderId);
+                else
+                    comments = commentService.getCommentsByUser(authentication.getName());
 
-            final Order order = orderFindById.get();
-            modelMap.put("loggedEmail" , authentication.getName());
-            modelMap.put("orderName" , order.getName());
-            modelMap.put("orderId" , order.getId());
+                modelMap.put("comments" , commentsMapper.toDtoComments(comments));
+
+                final Order order = orderFindById.get();
+                modelMap.put("loggedEmail" , authentication.getName());
+                modelMap.put("orderName" , order.getName());
+                modelMap.put("orderId" , order.getId());
+            }
+            else modelMap.put("error" , "Invalid order id");
         }
-        else modelMap.put("error" , "Invalid order id");
 
         return "comments";
     }
