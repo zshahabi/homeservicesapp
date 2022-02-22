@@ -1,5 +1,6 @@
 package com.home.services.controller;
 
+import com.home.services.data.entity.Comments;
 import com.home.services.data.entity.Order;
 import com.home.services.data.entity.Suggestion;
 import com.home.services.data.entity.User;
@@ -12,6 +13,7 @@ import com.home.services.dto.DTOAddSuggestion;
 import com.home.services.dto.DTOCustomerRegister;
 import com.home.services.dto.DTOExpertRegister;
 import com.home.services.dto.DTOSearchUser;
+import com.home.services.dto.mapper.CommentsMapper;
 import com.home.services.dto.mapper.MainServiceForAddSubServiceMapper;
 import com.home.services.dto.mapper.ShowSuggestionMapper;
 import com.home.services.dto.mapper.UsersMapper;
@@ -32,6 +34,7 @@ import com.home.services.exception.NotFoundUserException;
 import com.home.services.exception.ThePaymentAmountIsInsufficient;
 import com.home.services.exception.ThisOrderHasBeenPaidException;
 import com.home.services.other.Str;
+import com.home.services.service.CommentService;
 import com.home.services.service.CustomerService;
 import com.home.services.service.ExpertService;
 import com.home.services.service.MainServicesService;
@@ -39,6 +42,8 @@ import com.home.services.service.OrderService;
 import com.home.services.service.SubServiceService;
 import com.home.services.service.SuggestionService;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -50,6 +55,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.RolesAllowed;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -60,7 +66,8 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
                     SuggestionService suggestionService , ShowSuggestionMapper showSuggestionMapper ,
                     MainServicesService mainServicesService ,
                     MainServiceForAddSubServiceMapper mainServiceForAddSubServiceMapper , ExpertService expertService ,
-                    CustomerService customerService , UsersMapper usersMapper)
+                    CustomerService customerService , UsersMapper usersMapper , CommentService commentService ,
+                    CommentsMapper commentsMapper)
 {
     @RequestMapping(value = {"/" , "/home" , "/index"}, method = RequestMethod.GET)
     public String index()
@@ -75,13 +82,32 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     }
 
     @RequestMapping(value = "/service-view")
-    @RolesAllowed("ADMIN")
-    public String serviceView(final ModelMap model)
+    public String serviceView(final ModelMap model , Authentication authentication)
     {
-        final List<Order> orders = orderService.orderRepository().findAll();
+        final UserDetails details = (UserDetails) authentication.getPrincipal();
+        final Collection<? extends GrantedAuthority> authorities = details.getAuthorities();
+
+        Roles role;
+
+        final List<Order> orders = (((role = hasRole(authorities , Roles.ADMIN)) != null) || ((role = hasRole(authorities , Roles.EXPERT)) != null)) ?
+                orderService.orderRepository().findAll() : orderService.orderRepository().findByCustomerEmail(authentication.getName());
+
+        if (role == null) role = Roles.CUSTOMER;
+
+        model.put("role" , role.name().toLowerCase(Locale.ROOT));
         model.put("orders" , orders);
 
         return "services";
+    }
+
+    private Roles hasRole(final Collection<? extends GrantedAuthority> authorities , final Roles role)
+    {
+        for (final GrantedAuthority authority : authorities)
+        {
+            if (authority.getAuthority().equals(role.name())) return role;
+        }
+
+        return null;
     }
 
     @RequestMapping(value = "/add-new-order", method = RequestMethod.GET)
@@ -564,4 +590,32 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
         return "search-users";
     }
+
+    @RequestMapping(value = "/order-comments/{ORDER_ID}", method = RequestMethod.GET)
+    public String getComments(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId , final Authentication authentication)
+    {
+        final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
+
+        final Optional<Order> orderFindById = orderService.orderRepository().findById(orderId);
+
+        if (orderFindById.isPresent())
+        {
+            final List<Comments> comments;
+
+            if (hasRole(authentication.getAuthorities() , Roles.ADMIN) != null || hasRole(authentication.getAuthorities() , Roles.EXPERT) != null)
+                comments = commentService.getCommentsByOrder(orderId);
+            else
+                comments = commentService.getCommentsByUser(authentication.getName());
+
+            modelMap.put("comments" , commentsMapper.toDtoComments(comments));
+
+            final Order order = orderFindById.get();
+            modelMap.put("orderName" , order.getName());
+            modelMap.put("orderId" , order.getId());
+        }
+        else modelMap.put("error" , "Invalid order id");
+
+        return "comments";
+    }
+
 }

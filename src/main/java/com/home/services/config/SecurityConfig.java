@@ -31,15 +31,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     protected void configure(HttpSecurity http) throws Exception
     {
         http.cors().disable()
-                .authorizeRequests().antMatchers("/" , "/register" , "/css/**")
+                .authorizeRequests().antMatchers("/" , "/register" , "/register-customer" , "/register-expert" , "/css/**")
                 .permitAll()
 
                 .antMatchers("/add-suggestion/**").hasAuthority("EXPERT")
                 .antMatchers("/add-main-service").hasAuthority("ADMIN")
                 .antMatchers("/add-subservice").hasAuthority("ADMIN")
                 .antMatchers("/add-new-order").hasAuthority("ADMIN")
-                .antMatchers("/service-view").hasAuthority("ADMIN")
-                .antMatchers("/show-suggestion" , "/show-suggestion/**").hasAuthority("ADMIN")
+                .antMatchers("/service-view").hasAnyAuthority("ADMIN" , "EXPERT")
+                .antMatchers("/show-suggestion" , "/show-suggestion/**").hasAnyAuthority("ADMIN" , "EXPERT")
                 .antMatchers("/users" , "/users/**").hasAuthority("ADMIN")
                 .antMatchers("/edit-user" , "/edit-user/**").hasAuthority("ADMIN")
                 .antMatchers("/remove-user" , "/remove-user/**").hasAuthority("ADMIN")

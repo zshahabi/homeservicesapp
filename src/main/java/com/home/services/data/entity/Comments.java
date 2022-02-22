@@ -30,7 +30,7 @@ public class Comments
 
     @ManyToOne
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
-    private User customer;
+    private User user;
 
     private String comment;
 

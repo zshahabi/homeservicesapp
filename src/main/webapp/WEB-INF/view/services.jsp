@@ -41,21 +41,24 @@
         <tbody>
 
         <jstl:if test="${orders.size() > 0}">
-            <jstl:forEach items="${orders}" var="order">
+            <jstl:forEach items="${orders}" var="comment">
                 <tr>
-                    <td class="lalign">${order.id}</td>
-                    <td>${order.orderStatus.name()}</td>
-                    <td>${order.name}</td>
-                    <td>${order.customer.name}</td>
-                    <td>${order.subService.name}</td>
-                    <td>${order.expert.name}</td>
-                    <td>${order.address.street}</td>
-                    <td>${order.description}</td>
-                    <td>${order.requestAt.toString()}</td>
+                    <td class="lalign">${comment.id}</td>
+                    <td>${comment.orderStatus.name()}</td>
+                    <td>${comment.name}</td>
+                    <td>${comment.customer.name}</td>
+                    <td>${comment.subService.name}</td>
+                    <td>${comment.expert.name}</td>
+                    <td>${comment.address.street}</td>
+                    <td>${comment.description}</td>
+                    <td>${comment.requestAt.toString()}</td>
                     <td>
-                        <a href="/add-suggestion/${order.id}" class="btn btn-success">Add suggestion</a>
-                        <a href="/show-suggestion/${order.id}" class="btn btn-primary">Show suggestion</a>
-                        <a href="/order-payment/${order.id}" class="btn btn-info">Payment</a>
+                        <jstl:if test="${role == 'admin' || role == 'expert'}">
+                             <a href="/add-suggestion/${comment.id}" class="btn btn-success">Add suggestion</a>
+                             <a href="/show-suggestion/${comment.id}" class="btn btn-primary">Show suggestion</a>
+                             <a href="/order-payment/${comment.id}" class="btn btn-info">Payment</a>
+                        </jstl:if>
+                        <a href="/order-comments/${comment.id}" class="btn btn-primary">Comment</a>
                     </td>
                 </tr>
             </jstl:forEach>

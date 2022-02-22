@@ -26,7 +26,7 @@
                 divImageChooser.innerHTML = '<label>Select image<input type="file" class="form-control" name="image" /></label>';
                 registerForm.enctype = "multipart/form-data";
             }
-            else if (userType === "customer")
+            else // if (userType === "customer")
             {
                 registerForm.action = "/register-customer";
                 divImageChooser.innerHTML = "";
@@ -87,7 +87,7 @@
                 <input type="file" class="form-control" name="image" />
             </label>
       </div>
-      <input type="submit" class="btn btn-primary" name="submit" value="Add suggestion" />
+      <input type="submit" class="btn btn-primary" name="submit" value="Add user" />
   </form:form>
 </div>
 
