@@ -7,23 +7,14 @@ import com.home.services.other.Str;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.List;
 
 @Component
-public final class CreateQuerySearchUser
+public record CreateQuerySearchUser(EntityManager entityManager)
 {
 
-    @PersistenceContext
-    private final EntityManager entityManager;
-
-    private CreateQuerySearchUser(final EntityManager entityManager)
-    {
-        this.entityManager = entityManager;
-    }
-
-    public List<?> createQuery(final String entityName , final DTOSearchUser dtoSearchUser) throws InvalidUserStatusException
+    public List<?> createQuery(final DTOSearchUser dtoSearchUser) throws InvalidUserStatusException
     {
         final UserStatus userStatus;
 
@@ -34,7 +25,7 @@ public final class CreateQuerySearchUser
         }
         else userStatus = null;
 
-        final StringBuilder strQuery = new StringBuilder("select varSelect from ").append(entityName).append(" varSelect ");
+        final StringBuilder strQuery = new StringBuilder("select user from User user ");
 
         boolean hasName = false, hasFamily = false, hasEmail = false, hasUserStatus = false, hasSubServiceName = false;
         boolean hasWhere = false;
@@ -44,7 +35,7 @@ public final class CreateQuerySearchUser
             strQuery.append("where ");
             hasWhere = true;
             hasName = true;
-            strQuery.append(" varSelect.name = :NAME");
+            strQuery.append(" user.name = :NAME");
         }
         if (Str.notEmpty(dtoSearchUser.getFamily()))
         {
@@ -57,7 +48,7 @@ public final class CreateQuerySearchUser
 
             hasFamily = true;
 
-            strQuery.append(" varSelect.family = :FAMILY");
+            strQuery.append(" user.family = :FAMILY");
         }
         if (Str.notEmpty(dtoSearchUser.getEmail()))
         {
@@ -70,7 +61,7 @@ public final class CreateQuerySearchUser
 
             hasEmail = true;
 
-            strQuery.append(" varSelect.email = :EMAIL");
+            strQuery.append(" user.email = :EMAIL");
         }
 
         if (Str.notEmpty(dtoSearchUser.getUserStatus()))
@@ -79,7 +70,7 @@ public final class CreateQuerySearchUser
 
             hasUserStatus = true;
 
-            strQuery.append(" varSelect.userStatus = :STATUS");
+            strQuery.append(" user.userStatus = :STATUS");
         }
 
         final Query query = entityManager.createQuery(strQuery.toString());

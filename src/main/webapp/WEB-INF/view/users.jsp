@@ -7,15 +7,22 @@
   <title>Users</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
     <link rel="stylesheet" type="text/css" href="/css/services.css">
+        <script>
+            const onClickBtnSearch = () => window.location.href = "/users/${role}/search";
+        </script>
 </head>
 <body>
   <div id="wrapper">
      <h1>Users [${role}]</h1>
-    <jstl:if test="${error != null}">
-        <div class="alert alert-danger" role="alert">
-                ${error}
-        </div>
-    </jstl:if>
+      <div>
+            <button type="button" onclick="onClickBtnSearch()" class="btn btn-outline-primary waves-effect" id="search">Search</button>
+      </div>
+
+        <jstl:if test="${error != null}">
+            <div class="alert alert-danger" role="alert">
+                    ${error}
+            </div>
+        </jstl:if>
     <table id="keywords">
         <thead>
         <tr>

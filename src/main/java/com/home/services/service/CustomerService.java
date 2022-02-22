@@ -57,7 +57,7 @@ public record CustomerService(UserRepository userRepository ,
 
     public List<User> searchCustomer(final DTOSearchUser dtoSearchUser) throws InvalidUserStatusException
     {
-        final List<?> customer = createQuerySearchUser.createQuery("Customer" , dtoSearchUser);
+        final List<?> customer = createQuerySearchUser.createQuery(dtoSearchUser);
 
         if (customer != null && customer.size() > 0) return (List<User>) customer;
         else throw new NullPointerException("Not found customer");

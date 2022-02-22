@@ -6,7 +6,7 @@ import com.home.services.data.enums.UserStatus;
 import com.home.services.data.repository.CreateQuerySearchUser;
 import com.home.services.data.repository.UserRepository;
 import com.home.services.dto.DTOExpertRegister;
-import com.home.services.dto.DTOSearchExpert;
+import com.home.services.dto.DTOSearchUser;
 import com.home.services.dto.mapper.AddressMapper;
 import com.home.services.exception.FoundEmailException;
 import com.home.services.exception.ImageSizeException;
@@ -83,9 +83,9 @@ public record ExpertService(UserRepository expertRepository ,
         return (expertRepository.findByEmail(email) != null);
     }
 
-    public List<User> searchExperts(final DTOSearchExpert dtoSearchExpert) throws InvalidUserStatusException
+    public List<User> searchExperts(final DTOSearchUser dtoSearchUser) throws InvalidUserStatusException
     {
-        final List<?> experts = createQuerySearchUser.createQuery("Expert" , dtoSearchExpert);
+        final List<?> experts = createQuerySearchUser.createQuery(dtoSearchUser);
 
         if (experts != null && experts.size() > 0) return (List<User>) experts;
         else throw new NullPointerException("Not found expert");

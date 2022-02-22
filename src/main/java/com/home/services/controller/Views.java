@@ -11,6 +11,7 @@ import com.home.services.dto.DTOAddSubService;
 import com.home.services.dto.DTOAddSuggestion;
 import com.home.services.dto.DTOCustomerRegister;
 import com.home.services.dto.DTOExpertRegister;
+import com.home.services.dto.DTOSearchUser;
 import com.home.services.dto.mapper.MainServiceForAddSubServiceMapper;
 import com.home.services.dto.mapper.ShowSuggestionMapper;
 import com.home.services.dto.mapper.UsersMapper;
@@ -23,6 +24,7 @@ import com.home.services.exception.InvalidImageException;
 import com.home.services.exception.InvalidPasswordException;
 import com.home.services.exception.InvalidPostalCodeException;
 import com.home.services.exception.InvalidPriceException;
+import com.home.services.exception.InvalidUserStatusException;
 import com.home.services.exception.NotFoundOrderException;
 import com.home.services.exception.NotFoundSubServiceException;
 import com.home.services.exception.NotFoundSuggestionException;
@@ -341,7 +343,7 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     @RequestMapping(value = "/register-expert", method = RequestMethod.POST)
     public String register(final ModelMap modelMap , @ModelAttribute("addNewUser") final DTOExpertRegister dtoRegister)
     {
-        final Roles role = cheUserTypeRegister(modelMap , dtoRegister.getUserType());
+        final Roles role = checkRole(modelMap , dtoRegister.getUserType());
 
         boolean result = false;
         if (role != null)
@@ -378,7 +380,7 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     @RequestMapping(value = "/register-customer", method = RequestMethod.POST)
     public String register(final ModelMap modelMap , @ModelAttribute("addNewUser") final DTOCustomerRegister dtoRegister)
     {
-        final Roles role = cheUserTypeRegister(modelMap , dtoRegister.getUserType());
+        final Roles role = checkRole(modelMap , dtoRegister.getUserType());
 
         boolean result = false;
         if (role != null)
@@ -402,12 +404,12 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         return "register";
     }
 
-    private Roles cheUserTypeRegister(final ModelMap modelMap , final String userTypeStr)
+    private Roles checkRole(final ModelMap modelMap , final String roleStr)
     {
         try
         {
-            if (Str.notEmpty(userTypeStr) && !userTypeStr.toUpperCase(Locale.ROOT).equals("ADMIN"))
-                return Roles.valueOf(userTypeStr.toUpperCase(Locale.ROOT));
+            if (Str.notEmpty(roleStr) && !roleStr.toUpperCase(Locale.ROOT).equals("ADMIN"))
+                return Roles.valueOf(roleStr.toUpperCase(Locale.ROOT));
             else throw new Exception();
         }
         catch (Exception e)
@@ -422,7 +424,7 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     @RolesAllowed({"ADMIN"})
     public String users(final ModelMap modelMap , @PathVariable(value = "ROLE") final String roleStr)
     {
-        final Roles role = cheUserTypeRegister(modelMap , roleStr);
+        final Roles role = checkRole(modelMap , roleStr);
         if (role != null)
         {
             modelMap.put("role" , role.name().toLowerCase(Locale.ROOT));
@@ -495,5 +497,65 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         modelMap.put("operationName" , "Remove user");
 
         return "operation-users";
+    }
+
+    @RequestMapping(value = "/users/{ROLE}/search", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN"})
+    public String searchUsers(final ModelMap modelMap , @PathVariable(value = "ROLE") final String strRole)
+    {
+        modelMap.put("role" , strRole);
+
+        checkRole(modelMap , strRole);
+
+        return "search-users";
+    }
+
+    @RequestMapping(value = "/users/{ROLE}/search", method = RequestMethod.POST)
+    @RolesAllowed({"ADMIN"})
+    public String searchUsers(final ModelMap modelMap , @PathVariable(value = "ROLE") final String strRole , @ModelAttribute("searchUsers") final DTOSearchUser dtoSearchUser)
+    {
+        modelMap.put("role" , strRole);
+
+        final Roles role = checkRole(modelMap , strRole);
+
+        if (role != null)
+        {
+            List<User> users = null;
+
+            dtoSearchUser.setUserStatus(dtoSearchUser.getUserStatus().toUpperCase(Locale.ROOT).replace(" " , "_"));
+
+            if (role.equals(Roles.EXPERT))
+            {
+                try
+                {
+                    users = expertService.searchExperts(dtoSearchUser);
+                }
+                catch (InvalidUserStatusException | NullPointerException e)
+                {
+                    modelMap.put("error" , e.getMessage());
+                }
+            }
+            else if (role.equals(Roles.CUSTOMER))
+            {
+                try
+                {
+                    users = customerService.searchCustomer(dtoSearchUser);
+                }
+                catch (InvalidUserStatusException e)
+                {
+                    modelMap.put("error" , e.getMessage());
+                }
+            }
+            else modelMap.put("error" , "Invalid role");
+
+
+            if (users != null)
+            {
+                modelMap.put("users" , usersMapper.toDtoUsers(users));
+                return "users";
+            }
+        }
+
+        return "search-users";
     }
 }
