@@ -21,6 +21,7 @@ public final class CommentsMapper
             {
                 final DTOComments dtoComment = new DTOComments();
                 dtoComment.setId(comment.getId());
+                dtoComment.setUserId(comment.getUser().getId());
                 dtoComment.setText(comment.getComment());
                 dtoComment.setUser(comment.getUser().getEmail());
                 dtoComment.setCreatedAt(comment.getCreatedAt().toString());

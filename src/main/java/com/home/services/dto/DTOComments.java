@@ -10,6 +10,7 @@ import lombok.Setter;
 public final class DTOComments
 {
     private long id;
+    private long userId;
     private String user;
     private String text;
     private String createdAt;

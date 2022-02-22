@@ -89,8 +89,7 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
         Roles role;
 
-        final List<Order> orders = (((role = hasRole(authorities , Roles.ADMIN)) != null) || ((role = hasRole(authorities , Roles.EXPERT)) != null)) ?
-                orderService.orderRepository().findAll() : orderService.orderRepository().findByCustomerEmail(authentication.getName());
+        final List<Order> orders = (((role = hasRole(authorities , Roles.ADMIN)) != null) || ((role = hasRole(authorities , Roles.EXPERT)) != null)) ? orderService.orderRepository().findAll() : orderService.orderRepository().findByCustomerEmail(authentication.getName());
 
         if (role == null) role = Roles.CUSTOMER;
 
@@ -606,8 +605,7 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
                 if (hasRole(authentication.getAuthorities() , Roles.ADMIN) != null || hasRole(authentication.getAuthorities() , Roles.EXPERT) != null)
                     comments = commentService.getCommentsByOrder(orderId);
-                else
-                    comments = commentService.getCommentsByUser(authentication.getName());
+                else comments = commentService.getCommentsByUser(authentication.getName());
 
                 modelMap.put("comments" , commentsMapper.toDtoComments(comments));
 
@@ -622,4 +620,25 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         return "comments";
     }
 
+    @RequestMapping(value = "/remove-comment/{COMMENT_ID}", method = RequestMethod.GET)
+    public String removeComment(final ModelMap modelMap , @PathVariable(value = "COMMENT_ID") final String strCommentId , final Authentication authentication)
+    {
+        final long commentId = checkStrId(modelMap , strCommentId , "Invalid comment id");
+
+        boolean result = false;
+        if (commentId > 0)
+        {
+            final Comments comment = commentService.commentRepository().findByIdAndUserEmail(commentId , authentication.getName());
+            if (comment != null)
+            {
+                commentService.commentRepository().delete(comment);
+                result = true;
+            }
+            else modelMap.put("error" , "Not found comment");
+        }
+        modelMap.put("operationName" , "Remove comment");
+        modelMap.put("result" , result);
+
+        return "operation-users";
+    }
 }

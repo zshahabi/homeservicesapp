@@ -15,5 +15,7 @@ public interface CommentRepository extends JpaRepository<Comments, Long>
 
     List<Comments> findByUserId(final long customerId);
 
-    List<Comments> findByUserIdAndOrderId(final long customerId , final long orderId);
+    List<Comments> findByUserIdAndOrderId(final long userId , final long orderId);
+
+    Comments findByIdAndUserEmail(final long commentId , final String userEmail);
 }
