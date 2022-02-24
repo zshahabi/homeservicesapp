@@ -14,6 +14,7 @@
     </jstl:if>
 </head>
 <body>
+<jsp:include page="header.jsp" />
 <div id="wrapper">
     <h1>Sub service</h1>
 

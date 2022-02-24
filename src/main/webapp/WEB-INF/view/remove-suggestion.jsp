@@ -9,6 +9,7 @@
   <title>Remove suggestion</title>
 </head>
 <body>
+<jsp:include page="header.jsp" />
 <jstl:if test="${error != null}">
     <div class="alert alert-danger" role="alert">
             ${error}

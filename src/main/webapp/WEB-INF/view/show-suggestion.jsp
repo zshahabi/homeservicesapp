@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="/css/services.css">
 </head>
 <body>
+<jsp:include page="header.jsp" />
 <div id="wrapper">
     <h1>Suggestion [${orderName}]</h1>
     <jstl:if test="${error != null}">

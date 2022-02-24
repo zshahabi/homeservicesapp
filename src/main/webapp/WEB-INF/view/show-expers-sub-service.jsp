@@ -12,6 +12,7 @@
     </script>
 </head>
 <body>
+<jsp:include page="header.jsp" />
 <div id="wrapper">
     <h1>Experts [${subServiceName}]</h1>
 

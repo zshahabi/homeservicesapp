@@ -85,14 +85,17 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     }
 
     @RequestMapping("/login")
-    public String login()
+    public String login(final ModelMap modelMap , final Authentication authentication)
     {
+        setVarForHeader.set(modelMap , authentication);
         return "login";
     }
 
     @RequestMapping(value = "/service-view")
     public String serviceView(final ModelMap model , Authentication authentication)
     {
+        setVarForHeader.set(model , authentication , "/home");
+
         final UserDetails details = (UserDetails) authentication.getPrincipal();
         final Collection<? extends GrantedAuthority> authorities = details.getAuthorities();
 
@@ -120,16 +123,20 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/add-new-order", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN" , "EXPERT"})
-    public String addNewOrderView(final ModelMap model)
+    public String addNewOrderView(final ModelMap model , final Authentication authentication)
     {
+        setVarForHeader.set(model , authentication , "/service-view");
+
         model.put("subServiceNames" , getSubServiceNames());
         return "add-new-order";
     }
 
     @RequestMapping(value = "/add-new-order", method = RequestMethod.POST)
     @RolesAllowed({"ADMIN" , "EXPERT"})
-    public String addNewOrder(final ModelMap model , @ModelAttribute("dtoAddNewOrder") DTOAddOrder dtoAddOrder)
+    public String addNewOrder(final ModelMap model , final Authentication authentication , @ModelAttribute("dtoAddNewOrder") DTOAddOrder dtoAddOrder)
     {
+        setVarForHeader.set(model , authentication , "/service-view");
+
         boolean addOrder = false;
         try
         {
@@ -153,8 +160,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = {"/add-suggestion" , "/add-suggestion/{ORDER_ID}"}, method = RequestMethod.GET)
     @RolesAllowed("EXPERT")
-    public String addSuggestion(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId)
+    public String addSuggestion(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "ORDER_ID") final String strOrderId)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         long orderId = 0;
         try
         {
@@ -180,6 +189,8 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     @RolesAllowed("EXPERT")
     public String addSuggestion(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId , final Authentication authentication , @ModelAttribute("addSuggestion") final DTOAddSuggestion dtoAddSuggestion)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         long orderId = 0;
         try
         {
@@ -210,8 +221,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = {"/show-suggestion" , "/show-suggestion/{ORDER_ID}"}, method = RequestMethod.GET)
     @RolesAllowed({"ADMIN" , "EXPERT"})
-    public String showSuggestionOrder(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId)
+    public String showSuggestionOrder(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "ORDER_ID") final String strOrderId)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
 
         if (orderId > 0)
@@ -234,8 +247,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = {"/remove-suggestion" , "/remove-suggestion/{EXPERT_ID}/{SUGGESTION_ID}"}, method = RequestMethod.GET)
     @RolesAllowed({"ADMIN" , "EXPERT"})
-    public String removeSuggestion(final ModelMap modelMap , @PathVariable(value = "EXPERT_ID") final String strExpertId , @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
+    public String removeSuggestion(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "EXPERT_ID") final String strExpertId , @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         final long expertId = checkStrId(modelMap , strExpertId , "Invalid expert id");
         final long suggestionId = checkStrId(modelMap , strSuggestionId , "Invalid suggestion id");
 
@@ -258,8 +273,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = {"/accept-suggestion" , "/accept-suggestion/{EXPERT_ID}/{ORDER_ID}/{SUGGESTION_ID}"}, method = RequestMethod.GET)
     @RolesAllowed({"ADMIN" , "EXPERT"})
-    public String acceptSuggestion(final ModelMap modelMap , @PathVariable(value = "EXPERT_ID") final String strExpertId , @PathVariable(value = "ORDER_ID") final String strOrderId , @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
+    public String acceptSuggestion(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "EXPERT_ID") final String strExpertId , @PathVariable(value = "ORDER_ID") final String strOrderId , @PathVariable(value = "SUGGESTION_ID") final String strSuggestionId)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         final long expertId = checkStrId(modelMap , strExpertId , "Invalid expert id");
         final long suggestionId = checkStrId(modelMap , strSuggestionId , "Invalid suggestion id");
         final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
@@ -296,8 +313,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = {"/order-payment" , "/order-payment/{ORDER_ID}"}, method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
-    public String acceptSuggestion(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId)
+    public String acceptSuggestion(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "ORDER_ID") final String strOrderId)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
         if (orderId > 0)
         {
@@ -319,8 +338,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/add-subservice", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
-    public String addSubService(final ModelMap modelMap)
+    public String addSubService(final ModelMap modelMap , final Authentication authentication)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         modelMap.put("mainServices" , mainServiceForAddSubServiceMapper.toDtoMainServiceForAddSubServices(mainServicesService.mainServices()));
 
         return "add-subservice";
@@ -328,8 +349,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/add-subservice", method = RequestMethod.POST)
     @RolesAllowed({"ADMIN"})
-    public String addSubService(final ModelMap modelMap , @ModelAttribute("addSubService") final DTOAddSubService dtoAddSubService)
+    public String addSubService(final ModelMap modelMap , final Authentication authentication , @ModelAttribute("addSubService") final DTOAddSubService dtoAddSubService)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         modelMap.put("mainServices" , mainServiceForAddSubServiceMapper.toDtoMainServiceForAddSubServices(mainServicesService.mainServices()));
 
         boolean result = false;
@@ -349,15 +372,19 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/add-main-service", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
-    public String addMainService()
+    public String addMainService(final ModelMap modelMap , final Authentication authentication)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         return "add-main-service";
     }
 
     @RequestMapping(value = "/add-main-service", method = RequestMethod.POST)
     @RolesAllowed({"ADMIN"})
-    public String addMainService(final ModelMap modelMap , @RequestParam(value = "name") final String name)
+    public String addMainService(final ModelMap modelMap , final Authentication authentication , @RequestParam(value = "name") final String name)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         boolean result = false;
         try
         {
@@ -374,14 +401,18 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public String register()
+    public String register(final ModelMap modelMap , final Authentication authentication)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         return "register";
     }
 
     @RequestMapping(value = "/register-expert", method = RequestMethod.POST)
-    public String register(final ModelMap modelMap , @ModelAttribute("addNewUser") final DTOExpertRegister dtoRegister)
+    public String register(final ModelMap modelMap , final Authentication authentication , @ModelAttribute("addNewUser") final DTOExpertRegister dtoRegister)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         final Roles role = checkRole(modelMap , dtoRegister.getUserType());
 
         boolean result = false;
@@ -417,8 +448,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     }
 
     @RequestMapping(value = "/register-customer", method = RequestMethod.POST)
-    public String register(final ModelMap modelMap , @ModelAttribute("addNewUser") final DTOCustomerRegister dtoRegister)
+    public String register(final ModelMap modelMap , final Authentication authentication , @ModelAttribute("addNewUser") final DTOCustomerRegister dtoRegister)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         final Roles role = checkRole(modelMap , dtoRegister.getUserType());
 
         boolean result = false;
@@ -461,8 +494,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/users/{ROLE}", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
-    public String users(final ModelMap modelMap , @PathVariable(value = "ROLE") final String roleStr)
+    public String users(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "ROLE") final String roleStr)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         final Roles role = checkRole(modelMap , roleStr);
         if (role != null)
         {
@@ -483,8 +518,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/accept-user/{USER_ID}", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
-    public String acceptUser(final ModelMap modelMap , @PathVariable(value = "USER_ID") final String strUserId)
+    public String acceptUser(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "USER_ID") final String strUserId)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         final long userId = checkStrId(modelMap , strUserId , "Invalid user id");
 
         boolean result = false;
@@ -512,8 +549,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/remove-user/{USER_ID}", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
-    public String removeUser(final ModelMap modelMap , @PathVariable(value = "USER_ID") final String strUserId)
+    public String removeUser(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "USER_ID") final String strUserId)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         final long userId = checkStrId(modelMap , strUserId , "Invalid user id");
 
         boolean result = false;
@@ -540,8 +579,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/users/{ROLE}/search", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
-    public String searchUsers(final ModelMap modelMap , @PathVariable(value = "ROLE") final String strRole)
+    public String searchUsers(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "ROLE") final String strRole)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         modelMap.put("role" , strRole);
 
         checkRole(modelMap , strRole);
@@ -551,8 +592,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/users/{ROLE}/search", method = RequestMethod.POST)
     @RolesAllowed({"ADMIN"})
-    public String searchUsers(final ModelMap modelMap , @PathVariable(value = "ROLE") final String strRole , @ModelAttribute("searchUsers") final DTOSearchUser dtoSearchUser)
+    public String searchUsers(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "ROLE") final String strRole , @ModelAttribute("searchUsers") final DTOSearchUser dtoSearchUser)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         modelMap.put("role" , strRole);
 
         final Roles role = checkRole(modelMap , strRole);
@@ -601,6 +644,8 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     @RequestMapping(value = "/order-comments/{ORDER_ID}", method = RequestMethod.GET)
     public String getComments(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId , final Authentication authentication)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
 
         if (orderId > 0)
@@ -631,6 +676,8 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     @RequestMapping(value = "/remove-comment/{COMMENT_ID}", method = RequestMethod.GET)
     public String removeComment(final ModelMap modelMap , @PathVariable(value = "COMMENT_ID") final String strCommentId , final Authentication authentication)
     {
+        setVarForHeader.set(modelMap , authentication);
+
         final long commentId = checkStrId(modelMap , strCommentId , "Invalid comment id");
 
         boolean result = false;
@@ -651,8 +698,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     }
 
     @RequestMapping(value = "/add-comment/{ORDER_ID}", method = RequestMethod.GET)
-    public String addComment(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId)
+    public String addComment(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "ORDER_ID") final String strOrderId)
     {
+        setVarForHeader.set(modelMap , authentication);
+
         final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
 
         if (orderId > 0)
@@ -669,6 +718,8 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     @RequestMapping(value = "/add-comment/{ORDER_ID}", method = RequestMethod.POST)
     public String addComment(final ModelMap modelMap , @PathVariable(value = "ORDER_ID") final String strOrderId , @RequestParam("textComment") final String textComment , final Authentication authentication)
     {
+        setVarForHeader.set(modelMap , authentication);
+
         final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
 
         final AtomicBoolean result = new AtomicBoolean(false);
@@ -703,6 +754,8 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     @RolesAllowed({"ADMIN" , "EXPERT"})
     public String subServices(final ModelMap modelMap , final Authentication authentication)
     {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
         final User userFindByEmail = customerService.userRepository().findByEmail(authentication.getName());
         final Roles role = userFindByEmail.getRoles().get(0);
 
@@ -716,8 +769,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/sub-services/show-experts/{SUB_SERVICE_ID}", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
-    public String showExpertsSubService(final ModelMap modelMap , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId)
+    public String showExpertsSubService(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId)
     {
+        setVarForHeader.set(modelMap , authentication , "/sub-services");
+
         final long subServiceId = checkStrId(modelMap , strSubServiceId , "Invalid sub service id");
 
         if (subServiceId > 0)
@@ -738,8 +793,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/sub-services/add-expert/{SUB_SERVICE_ID}", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
-    public String addExpertSubService(final ModelMap modelMap , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId)
+    public String addExpertSubService(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId)
     {
+        setVarForHeader.set(modelMap , authentication , "/sub-services");
+
         final long subServiceId = checkStrId(modelMap , strSubServiceId , "Invalid sub service id");
 
         if (subServiceId > 0)
@@ -758,8 +815,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/sub-services/add-expert/{SUB_SERVICE_ID}", method = RequestMethod.POST)
     @RolesAllowed({"ADMIN"})
-    public String addExpertSubService(final ModelMap modelMap , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId , @RequestParam(value = "expertEmail") final String expertEmail)
+    public String addExpertSubService(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId , @RequestParam(value = "expertEmail") final String expertEmail)
     {
+        setVarForHeader.set(modelMap , authentication , "/sub-services");
+
         final long subServiceId = checkStrId(modelMap , strSubServiceId , "Invalid sub service id");
 
         final AtomicBoolean result = new AtomicBoolean(false);
@@ -793,8 +852,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/sub-services/remove-expert/{SUB_SERVICE_ID}/{EXPERT_ID}", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
-    public String removeExpert(final ModelMap modelMap , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId , @PathVariable(value = "EXPERT_ID") final String strExpertId)
+    public String removeExpert(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId , @PathVariable(value = "EXPERT_ID") final String strExpertId)
     {
+        setVarForHeader.set(modelMap , authentication , "/sub-services");
+
         final long subServiceId = checkStrId(modelMap , strSubServiceId , "Invalid sub service id");
         final long expertId = checkStrId(modelMap , strExpertId , "Invalid expert id");
 

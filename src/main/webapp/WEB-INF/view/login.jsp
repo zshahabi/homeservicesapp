@@ -7,6 +7,7 @@
     <link href="/css/home.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<jsp:include page="header.jsp" />
 <div class="login-wrap center">
     <h2>Login</h2>
 

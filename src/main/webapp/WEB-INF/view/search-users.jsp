@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="/css/add-new-order.css" />
 </head>
 <body>
+<jsp:include page="header.jsp" />
 <div class="mb-3 main center form-group card">
     <h3>Search users</h3>
     <jstl:if test="${error != null}">

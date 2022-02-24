@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="/css/add-new-order.css" />
 </head>
 <body>
+<jsp:include page="header.jsp" />
 <div class="mb-3 main center form-group card">
     <jstl:if test="${error != null}">
         <div class="alert alert-danger" role="alert">

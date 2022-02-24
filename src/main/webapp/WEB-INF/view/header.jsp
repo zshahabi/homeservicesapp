@@ -8,10 +8,7 @@
         else changeLocation(when)
     };
 
-    const changeLocation = (location) =>
-    {
-        window.location.href = location;
-    };
+    const changeLocation = (location) => window.location.href = location;
 </script>
 
 <style>
@@ -21,12 +18,18 @@
         background-color: #eee;
         border-radius: 10px;
     }
+
+    .btn-back
+    {
+        margin: 5px;
+    }
 </style>
 <header class="p-5 text-white">
 
 <div>
 
-    <button name="back" type="button" class="btn btn-dark float-right" onclick='back("${hdrBack}")'>Back</button>
+    <button type="button" class="btn btn-dark float-right btn-back" onclick='back("${hdrBack}")'>Back</button>
+    <button type="button" class="btn btn-dark float-right btn-back" onclick='changeLocation("/home")'>Home</button>
 
     <jstl:if test="${hdrIsLogin && hdrRole == 'admin'}">
         <button class="btn btn-outline-primary" type="button" onclick="changeLocation('/users/expert');">Experts info</button>

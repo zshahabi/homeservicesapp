@@ -14,7 +14,7 @@
  <title>Add new order</title>
 </head>
 <body>
-
+<jsp:include page="header.jsp" />
 <div class="mb-3 main center form-group card">
  <jstl:if test="${error != null}">
      <div class="alert alert-danger" role="alert">
