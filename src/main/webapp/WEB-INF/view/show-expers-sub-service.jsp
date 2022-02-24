@@ -31,7 +31,7 @@
                     <td class="lalign">${expert.id}</td>
                     <td>${expert.email}</td>
                     <td>
-                         <a href="/sub-services/remove-expert/${expert.id}" class="btn btn-success">Remove from list</a>
+                         <a href="/sub-services/remove-expert/${expert.id}" class="btn btn-danger">Remove from list</a>
                     </td>
                 </tr>
             </jstl:forEach>

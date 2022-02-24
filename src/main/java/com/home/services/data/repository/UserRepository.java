@@ -16,6 +16,8 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>
 {
+    User findByRolesContainsAndEmail(final Roles role , final String email);
+
     User findByEmail(final String email);
 
     User findById(final long id);
@@ -23,6 +25,8 @@ public interface UserRepository extends JpaRepository<User, Long>
     List<User> findByRolesContains(final Roles role);
 
     List<User> findByRolesContainsAndSubServicesId(final Roles role , final long subServiceId);
+
+    User findByRolesContainsAndSubServicesIdAndEmail(final Roles role , final long subServiceId , final String email);
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Modifying

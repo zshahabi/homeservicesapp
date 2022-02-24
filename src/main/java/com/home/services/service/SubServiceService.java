@@ -69,4 +69,9 @@ public record SubServiceService(SubServiceRepository subServiceRepository , Main
         else throw new FoundSubServiceException(dtoAddSubService.getName());
     }
 
+    public SubService getSubServiceById(final long subServiceId)
+    {
+        return subServiceRepository.findAllById(subServiceId);
+    }
+
 }

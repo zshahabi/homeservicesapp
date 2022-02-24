@@ -21,6 +21,7 @@ import com.home.services.dto.mapper.ShowSuggestionMapper;
 import com.home.services.dto.mapper.SubServiceMapper;
 import com.home.services.dto.mapper.UsersMapper;
 import com.home.services.exception.FoundEmailException;
+import com.home.services.exception.FoundExpertOnThisSubServiceException;
 import com.home.services.exception.FoundMainServiceException;
 import com.home.services.exception.FoundSubServiceException;
 import com.home.services.exception.ImageSizeException;
@@ -714,9 +715,9 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
     @RequestMapping(value = "/sub-services/show-experts/{SUB_SERVICE_ID}", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
-    public String showExperts(final ModelMap modelMap , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId)
+    public String showExpertsSubService(final ModelMap modelMap , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId)
     {
-        final long subServiceId = checkStrId(modelMap , strSubServiceId , "Invalid sub service is");
+        final long subServiceId = checkStrId(modelMap , strSubServiceId , "Invalid sub service id");
 
         if (subServiceId > 0)
         {
@@ -728,5 +729,60 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         }
 
         return "show-expers-sub-service";
+    }
+
+    @RequestMapping(value = "/sub-services/add-expert/{SUB_SERVICE_ID}", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN"})
+    public String addExpertSubService(final ModelMap modelMap , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId)
+    {
+        final long subServiceId = checkStrId(modelMap , strSubServiceId , "Invalid sub service id");
+
+        if (subServiceId > 0)
+        {
+            final Optional<SubService> subServicesFindById = subServiceService.subServiceRepository().findById(subServiceId);
+
+            subServicesFindById.ifPresent(subService ->
+            {
+                modelMap.put("subServiceId" , subServiceId);
+                modelMap.put("subServiceName" , subService.getName());
+            });
+
+        }
+        return "add-expert-sub-service";
+    }
+
+    @RequestMapping(value = "/sub-services/add-expert/{SUB_SERVICE_ID}", method = RequestMethod.POST)
+    @RolesAllowed({"ADMIN"})
+    public String addExpertSubService(final ModelMap modelMap , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId , @RequestParam(value = "expertEmail") final String expertEmail)
+    {
+        final long subServiceId = checkStrId(modelMap , strSubServiceId , "Invalid sub service id");
+
+        final AtomicBoolean result = new AtomicBoolean(false);
+
+        if (subServiceId > 0)
+        {
+            final Optional<SubService> subServicesFindById = subServiceService.subServiceRepository().findById(subServiceId);
+
+            subServicesFindById.ifPresent(subService ->
+            {
+                modelMap.put("subServiceId" , subServiceId);
+                modelMap.put("subServiceName" , subService.getName());
+
+                try
+                {
+                    result.set(expertService.addExpertSubService(subServiceId , expertEmail));
+                }
+                catch (NotFoundSubServiceException | NotFoundUserException | FoundExpertOnThisSubServiceException e)
+                {
+                    modelMap.put("error" , e.getMessage());
+                }
+
+            });
+
+        }
+
+        modelMap.put("result" , result.get());
+
+        return "add-expert-sub-service";
     }
 }
