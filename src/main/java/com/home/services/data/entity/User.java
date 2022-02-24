@@ -26,9 +26,7 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -84,5 +82,5 @@ public class User implements Serializable
 
     @ManyToMany
     @ToString.Exclude
-    private Set<SubService> subServices = new HashSet<>();
+    private List<SubService> subServices = new ArrayList<>();
 }

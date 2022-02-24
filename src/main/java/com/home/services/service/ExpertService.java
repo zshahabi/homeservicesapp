@@ -16,6 +16,7 @@ import com.home.services.exception.InvalidImageException;
 import com.home.services.exception.InvalidPasswordException;
 import com.home.services.exception.InvalidPostalCodeException;
 import com.home.services.exception.InvalidUserStatusException;
+import com.home.services.exception.NotFoundExpertOnThisSubServiceException;
 import com.home.services.exception.NotFoundSubServiceException;
 import com.home.services.exception.NotFoundUserException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public record ExpertService(UserRepository expertRepository ,
@@ -114,6 +116,41 @@ public record ExpertService(UserRepository expertRepository ,
                 else throw new FoundExpertOnThisSubServiceException(expertEmail , subServiceFindById.getName());
             }
             else throw new NotFoundUserException("expert" , expertEmail);
+        }
+        else throw new NotFoundSubServiceException(subServiceId);
+    }
+
+    public boolean removeExpertSubService(final long subServiceId , final long expertId) throws NotFoundSubServiceException, NotFoundUserException, NotFoundExpertOnThisSubServiceException
+    {
+        final SubService subServiceFindById = subServiceService.getSubServiceById(subServiceId);
+        if (subServiceFindById != null)
+        {
+            final User expertFindById = expertRepository.findById(expertId);
+            if (expertFindById != null)
+            {
+                final User expert = expertRepository.findByRolesContainsAndSubServicesIdAndEmail(Roles.EXPERT , subServiceId , expertFindById.getEmail());
+                if (expert != null)
+                {
+                    final List<SubService> subServices = expertFindById.getSubServices();
+
+                    for (int i = 0, len = subServices.size(); i < len; i++)
+                    {
+                        if (Objects.equals(subServices.get(i).getId() , subServiceFindById.getId()))
+                        {
+                            subServices.remove(i);
+                            expertFindById.setSubServices(subServices);
+                            expertRepository.save(expertFindById);
+
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+                else
+                    throw new NotFoundExpertOnThisSubServiceException(expertFindById.getEmail() , subServiceFindById.getName());
+            }
+            else throw new NotFoundUserException("expert" , expertId);
         }
         else throw new NotFoundSubServiceException(subServiceId);
     }

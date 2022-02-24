@@ -31,6 +31,7 @@ import com.home.services.exception.InvalidPasswordException;
 import com.home.services.exception.InvalidPostalCodeException;
 import com.home.services.exception.InvalidPriceException;
 import com.home.services.exception.InvalidUserStatusException;
+import com.home.services.exception.NotFoundExpertOnThisSubServiceException;
 import com.home.services.exception.NotFoundOrderException;
 import com.home.services.exception.NotFoundSubServiceException;
 import com.home.services.exception.NotFoundSuggestionException;
@@ -723,7 +724,11 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         {
             final List<User> expertsFindByRole = customerService.userRepository().findByRolesContainsAndSubServicesId(Roles.EXPERT , subServiceId);
             final Optional<SubService> subServiceFindById = subServiceService.subServiceRepository().findById(subServiceId);
-            subServiceFindById.ifPresent(subService -> modelMap.put("subServiceName" , subService.getName()));
+            subServiceFindById.ifPresent(subService ->
+            {
+                modelMap.put("subServiceName" , subService.getName());
+                modelMap.put("subServiceId" , subService.getId());
+            });
 
             modelMap.put("experts" , showExpertMapper.toDtoShowExperts(expertsFindByRole));
         }
@@ -784,5 +789,32 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         modelMap.put("result" , result.get());
 
         return "add-expert-sub-service";
+    }
+
+    @RequestMapping(value = "/sub-services/remove-expert/{SUB_SERVICE_ID}/{EXPERT_ID}", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN"})
+    public String removeExpert(final ModelMap modelMap , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId , @PathVariable(value = "EXPERT_ID") final String strExpertId)
+    {
+        final long subServiceId = checkStrId(modelMap , strSubServiceId , "Invalid sub service id");
+        final long expertId = checkStrId(modelMap , strExpertId , "Invalid expert id");
+
+        boolean result = false;
+
+        if (subServiceId > 0 && expertId > 0)
+        {
+            try
+            {
+                result = expertService.removeExpertSubService(subServiceId , expertId);
+            }
+            catch (NotFoundSubServiceException | NotFoundUserException | NotFoundExpertOnThisSubServiceException e)
+            {
+                modelMap.put("error" , e.getMessage());
+            }
+        }
+
+        modelMap.put("result" , result);
+        modelMap.put("operationName" , "Remove expert sub service");
+
+        return "operation-users";
     }
 }

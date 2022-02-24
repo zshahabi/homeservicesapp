@@ -50,7 +50,6 @@
                         <td>
                              <a href="/sub-services/add-expert/${subService.id}" class="btn btn-success">Add Expert</a>
                              <a href="/sub-services/show-experts/${subService.id}" class="btn btn-primary">Show Experts</a>
-                             <a href="/sub-services/remove-sub-service/${subService.id}" class="btn btn-danger">Remove sub service</a>
                         </td>
                     </jstl:if>
                 </tr>
