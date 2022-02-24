@@ -2,6 +2,7 @@ package com.home.services.controller;
 
 import com.home.services.data.entity.Comments;
 import com.home.services.data.entity.Order;
+import com.home.services.data.entity.SubService;
 import com.home.services.data.entity.Suggestion;
 import com.home.services.data.entity.User;
 import com.home.services.data.enums.Roles;
@@ -15,7 +16,9 @@ import com.home.services.dto.DTOExpertRegister;
 import com.home.services.dto.DTOSearchUser;
 import com.home.services.dto.mapper.CommentsMapper;
 import com.home.services.dto.mapper.MainServiceForAddSubServiceMapper;
+import com.home.services.dto.mapper.ShowExpertMapper;
 import com.home.services.dto.mapper.ShowSuggestionMapper;
+import com.home.services.dto.mapper.SubServiceMapper;
 import com.home.services.dto.mapper.UsersMapper;
 import com.home.services.exception.FoundEmailException;
 import com.home.services.exception.FoundMainServiceException;
@@ -69,7 +72,8 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
                     MainServicesService mainServicesService ,
                     MainServiceForAddSubServiceMapper mainServiceForAddSubServiceMapper , ExpertService expertService ,
                     CustomerService customerService , UsersMapper usersMapper , CommentService commentService ,
-                    CommentsMapper commentsMapper)
+                    CommentsMapper commentsMapper , SubServiceMapper subServiceMapper ,
+                    ShowExpertMapper showExpertMapper)
 {
     @RequestMapping(value = {"/" , "/home" , "/index"}, method = RequestMethod.GET)
     public String index()
@@ -691,5 +695,38 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         modelMap.put("result" , result.get());
 
         return "add-comment";
+    }
+
+    @RequestMapping(value = "/sub-services", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN" , "EXPERT"})
+    public String subServices(final ModelMap modelMap , final Authentication authentication)
+    {
+        final User userFindByEmail = customerService.userRepository().findByEmail(authentication.getName());
+        final Roles role = userFindByEmail.getRoles().get(0);
+
+        final List<SubService> subServices = subServiceService.subServiceRepository().findAll();
+
+        modelMap.put("role" , role.name().toLowerCase(Locale.ROOT));
+        modelMap.put("subServices" , subServiceMapper.toDtoSubServices(subServices));
+
+        return "sub-services";
+    }
+
+    @RequestMapping(value = "/sub-services/show-experts/{SUB_SERVICE_ID}", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN"})
+    public String showExperts(final ModelMap modelMap , @PathVariable(value = "SUB_SERVICE_ID") final String strSubServiceId)
+    {
+        final long subServiceId = checkStrId(modelMap , strSubServiceId , "Invalid sub service is");
+
+        if (subServiceId > 0)
+        {
+            final List<User> expertsFindByRole = customerService.userRepository().findByRolesContainsAndSubServicesId(Roles.EXPERT , subServiceId);
+            final Optional<SubService> subServiceFindById = subServiceService.subServiceRepository().findById(subServiceId);
+            subServiceFindById.ifPresent(subService -> modelMap.put("subServiceName" , subService.getName()));
+
+            modelMap.put("experts" , showExpertMapper.toDtoShowExperts(expertsFindByRole));
+        }
+
+        return "show-expers-sub-service";
     }
 }

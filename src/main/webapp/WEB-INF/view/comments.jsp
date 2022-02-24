@@ -36,15 +36,15 @@
         <tbody>
 
         <jstl:if test="${comments.size() > 0}">
-            <jstl:forEach items="${comments}" var="comment">
+            <jstl:forEach items="${comments}" var="subService">
                 <tr>
-                    <td class="lalign">${comment.id}</td>
-                    <td>${comment.user}</td>
-                    <td>${comment.text}</td>
-                    <td>${comment.createdAt}</td>
-                    <jstl:if test="${comment.role == 'admin' || comment.role == 'expert' || loggedEmail == comment.user}">
+                    <td class="lalign">${subService.id}</td>
+                    <td>${subService.user}</td>
+                    <td>${subService.text}</td>
+                    <td>${subService.createdAt}</td>
+                    <jstl:if test="${subService.role == 'admin' || subService.role == 'expert' || loggedEmail == subService.user}">
                         <td>
-                            <a href="/remove-comment/${comment.id}" class="btn btn-danger">Remove</a>
+                            <a href="/remove-comment/${subService.id}" class="btn btn-danger">Remove</a>
                         </td>
                     </jstl:if>
                 </tr>

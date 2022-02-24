@@ -8,9 +8,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
     <link rel="stylesheet" type="text/css" href="/css/services.css">
     <script>
-        const onClickAddNewOrder = () => window.location.href = "/add-new-order";
-        const onClickAddSubService = () => window.location.href = "/add-subservice";
-        const onClickAddMainService = () => window.location.href = "/add-main-service";
+        const changeLocation = (route) => window.location.href = route;
     </script>
 </head>
 <body>
@@ -18,9 +16,10 @@
     <h1>Services</h1>
 
     <div>
-        <button type="button" onclick="onClickAddNewOrder()" class="btn btn-outline-primary waves-effect" id="add-new-order">Add new order</button>
-        <button type="button" onclick="onClickAddSubService()" class="btn btn-outline-primary waves-effect" id="add-sub-service">Add sub service</button>
-        <button type="button" onclick="onClickAddMainService()" class="btn btn-outline-primary waves-effect" id="add-main-service">Add main service</button>
+        <button type="button" onclick="changeLocation('/add-new-order')" class="btn btn-outline-primary waves-effect" id="add-new-order">Add new order</button>
+        <button type="button" onclick="changeLocation('/add-subservice')" class="btn btn-outline-primary waves-effect" id="add-sub-service">Add sub service</button>
+        <button type="button" onclick="changeLocation('/add-main-service')" class="btn btn-outline-primary waves-effect" id="add-main-service">Add main service</button>
+        <button type="button" onclick="changeLocation('/sub-services')" class="btn btn-outline-primary waves-effect" id="sub-services">Sub services</button>
     </div>
     <br />
     <table id="keywords">
@@ -41,24 +40,24 @@
         <tbody>
 
         <jstl:if test="${orders.size() > 0}">
-            <jstl:forEach items="${orders}" var="comment">
+            <jstl:forEach items="${orders}" var="subService">
                 <tr>
-                    <td class="lalign">${comment.id}</td>
-                    <td>${comment.orderStatus.name()}</td>
-                    <td>${comment.name}</td>
-                    <td>${comment.customer.name}</td>
-                    <td>${comment.subService.name}</td>
-                    <td>${comment.expert.name}</td>
-                    <td>${comment.address.street}</td>
-                    <td>${comment.description}</td>
-                    <td>${comment.requestAt.toString()}</td>
+                    <td class="lalign">${subService.id}</td>
+                    <td>${subService.orderStatus.name()}</td>
+                    <td>${subService.name}</td>
+                    <td>${subService.customer.name}</td>
+                    <td>${subService.subService.name}</td>
+                    <td>${subService.expert.name}</td>
+                    <td>${subService.address.street}</td>
+                    <td>${subService.description}</td>
+                    <td>${subService.requestAt.toString()}</td>
                     <td>
                         <jstl:if test="${role == 'admin' || role == 'expert'}">
-                             <a href="/add-suggestion/${comment.id}" class="btn btn-success">Add suggestion</a>
-                             <a href="/show-suggestion/${comment.id}" class="btn btn-primary">Show suggestion</a>
-                             <a href="/order-payment/${comment.id}" class="btn btn-info">Payment</a>
+                             <a href="/add-suggestion/${subService.id}" class="btn btn-success">Add suggestion</a>
+                             <a href="/show-suggestion/${subService.id}" class="btn btn-primary">Show suggestion</a>
+                             <a href="/order-payment/${subService.id}" class="btn btn-info">Payment</a>
                         </jstl:if>
-                        <a href="/order-comments/${comment.id}" class="btn btn-primary">Comment</a>
+                        <a href="/order-comments/${subService.id}" class="btn btn-primary">Comment</a>
                     </td>
                 </tr>
             </jstl:forEach>

@@ -22,6 +22,8 @@ public interface UserRepository extends JpaRepository<User, Long>
 
     List<User> findByRolesContains(final Roles role);
 
+    List<User> findByRolesContainsAndSubServicesId(final Roles role , final long subServiceId);
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Modifying
     @Query("update User user set user.userStatus = :STATUS where user.id = :USER_ID")
