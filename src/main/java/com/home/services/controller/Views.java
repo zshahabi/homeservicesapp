@@ -75,11 +75,12 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
                     MainServiceForAddSubServiceMapper mainServiceForAddSubServiceMapper , ExpertService expertService ,
                     CustomerService customerService , UsersMapper usersMapper , CommentService commentService ,
                     CommentsMapper commentsMapper , SubServiceMapper subServiceMapper ,
-                    ShowExpertMapper showExpertMapper)
+                    ShowExpertMapper showExpertMapper , SetVarForHeader setVarForHeader)
 {
     @RequestMapping(value = {"/" , "/home" , "/index"}, method = RequestMethod.GET)
-    public String index()
+    public String index(final ModelMap modelMap , final Authentication authentication)
     {
+        setVarForHeader.set(modelMap , authentication);
         return "index";
     }
 
@@ -345,7 +346,6 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
         return "add-subservice";
     }
-
 
     @RequestMapping(value = "/add-main-service", method = RequestMethod.GET)
     @RolesAllowed({"ADMIN"})
