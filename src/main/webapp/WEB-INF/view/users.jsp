@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="jstl" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,6 +84,12 @@
                         <jstl:if test="${user.status == 'WAITING_ACCEPT'}">
                             <a href="/accept-user/${user.id}" class="btn btn-outline-success">Accept user</a>
                         </jstl:if>
+
+                        <%--@elvariable id="changeAccountCredit" type="java.lang.String"--%>
+                        <form:form action="/users/change-account-credit/${user.id}" method="post">
+                            <input type="number" name="accountCredit" class="form-control" />
+                            <input type="submit" class="btn btn-success form-control" value="Change account credit" />
+                        </form:form>
                     </td>
                 </tr>
             </jstl:forEach>

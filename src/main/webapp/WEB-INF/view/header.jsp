@@ -31,6 +31,8 @@
     <button type="button" class="btn btn-dark float-right btn-back" onclick='back("${hdrBack}")'>Back</button>
     <button type="button" class="btn btn-dark float-right btn-back" onclick='changeLocation("/home")'>Home</button>
 
+    <button type="button" class="btn btn-dark float-right btn-back" onclick='changeLocation("/my-profile")'>My profile</button>
+
     <jstl:if test="${hdrIsLogin && hdrRole == 'admin'}">
         <button class="btn btn-outline-primary" type="button" onclick="changeLocation('/users/expert');">Experts info</button>
         <button class="btn btn-outline-primary" type="button" onclick="changeLocation('/users/customer');">Customer info</button>

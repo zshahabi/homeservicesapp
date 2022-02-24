@@ -1,4 +1,4 @@
-@import "compass/css3";
+/*@import "compass/css3";*/
 
 *
 {
@@ -7,7 +7,7 @@
     padding: 0;
 }
 
-html
+html, body
 {
     background: #95a5a6 url(http://subtlepatterns2015.subtlepatterns.netdna-cdn.com/patterns/dark_embroidery.png);
     font-family: 'Helvetica Neue', Arial, Sans-Serif, serif;
@@ -27,7 +27,7 @@ html .login-wrap
 {
     margin: 0;
     position: absolute;
-    top: 50%;
+    top: 36%;
     left: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);

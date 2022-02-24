@@ -14,6 +14,7 @@ import com.home.services.dto.DTOAddSuggestion;
 import com.home.services.dto.DTOCustomerRegister;
 import com.home.services.dto.DTOExpertRegister;
 import com.home.services.dto.DTOSearchUser;
+import com.home.services.dto.DTOUsers;
 import com.home.services.dto.mapper.CommentsMapper;
 import com.home.services.dto.mapper.MainServiceForAddSubServiceMapper;
 import com.home.services.dto.mapper.ShowExpertMapper;
@@ -878,4 +879,61 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
         return "operation-users";
     }
+
+    @RequestMapping(value = "/my-profile", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN"})
+    public String removeExpert(final ModelMap modelMap , final Authentication authentication)
+    {
+        if (authentication != null && authentication.isAuthenticated())
+        {
+            setVarForHeader.set(modelMap , authentication);
+
+            final User usersFindByEmail = expertService.expertRepository().findByEmail(authentication.getName());
+
+            final DTOUsers dtoUser = usersMapper.toDtoUser(usersFindByEmail);
+
+            modelMap.put("user" , dtoUser);
+        }
+
+        return "my-profile";
+    }
+
+    @RequestMapping(value = {"/users/change-account-credit" , "/users/change-account-credit/{USER_ID}"}, method = RequestMethod.POST)
+    @RolesAllowed({"ADMIN"})
+    public String changeAccountCredit(final ModelMap modelMap , final Authentication authentication , @RequestParam(value = "accountCredit") final String strAccountCredit , @PathVariable(value = "USER_ID") final String strUserId)
+    {
+        setVarForHeader.set(modelMap , authentication);
+
+        final long userId = checkStrId(modelMap , strUserId , "Invalid user id");
+
+        boolean result = false;
+        if (userId > 0)
+        {
+            try
+            {
+                final int accountCredit = Integer.parseInt(strAccountCredit);
+                if (accountCredit < 0) throw new Exception();
+
+                System.out.println(accountCredit);
+
+                final UserRepository userRepository = expertService.expertRepository();
+
+                final User userFindById = userRepository.findById(userId);
+                userFindById.setAccountCredit(accountCredit);
+                userRepository.save(userFindById);
+
+                result = true;
+            }
+            catch (Exception e)
+            {
+                modelMap.put("error" , "Invalid account credit");
+            }
+        }
+
+        modelMap.put("result" , result);
+        modelMap.put("operationName" , "Change account credit");
+
+        return "operation-users";
+    }
+
 }

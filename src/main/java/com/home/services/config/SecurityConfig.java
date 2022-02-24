@@ -47,6 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/remove-user" , "/remove-user/**").hasAuthority("ADMIN")
                 .antMatchers("/accept-user" , "/accept-user/**").hasAuthority("ADMIN")
                 .antMatchers("/order-payment" , "/order-payment/**").hasAuthority("ADMIN")
+                .antMatchers("/change-account-credit" , "/change-account-credit/**").hasAnyAuthority("ADMIN" , "EXPERT" , "CUSTOMER")
 
                 .anyRequest().authenticated()
                 .and().formLogin().loginPage("/login").usernameParameter("email").passwordParameter("password").permitAll()
