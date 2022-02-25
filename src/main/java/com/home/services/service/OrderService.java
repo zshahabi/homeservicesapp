@@ -38,7 +38,6 @@ public record OrderService(OrderRepository orderRepository , SuggestionService s
                 order.setAddress(addressMapper.toAddress(dtoAddOrder));
                 order.setCustomer(customer);
                 order.setSubService(subService);
-                order.setPrice(subService.getPrice());
                 order.setName(dtoAddOrder.getName());
                 order.setDescription(dtoAddOrder.getDescription());
                 order.setOrderStatus(OrderStatus.WAITING_FOR_SPECIALIST_SELECTION);
@@ -80,7 +79,6 @@ public record OrderService(OrderRepository orderRepository , SuggestionService s
         else throw new NotFoundOrderException(orderId);
     }
 
-    // final int price => yani key padakht online anjam shode , agar 0 bashe az hesab customer kasr mishe
     public boolean payment(final long orderId , final int price) throws NotFoundOrderException, NotFoundSuggestionException, ThePaymentAmountIsInsufficient, ThisOrderHasBeenPaidException
     {
         final Optional<Order> orderFindById = orderRepository.findById(orderId);
