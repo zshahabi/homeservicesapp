@@ -53,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/add-main-service").hasAuthority("ADMIN")
                 .antMatchers("/add-subservice").hasAuthority("ADMIN")
                 .antMatchers("/sub-services").hasAnyAuthority("ADMIN" , "EXPERT")
+                .antMatchers("/set-done-order").hasAnyAuthority("ADMIN" , "EXPERT")
                 .antMatchers("/customer-order-payment" , "/customer-order-payment/**").hasAuthority("CUSTOMER")
                 .antMatchers("/sub-services/**").hasAnyAuthority("ADMIN")
                 .antMatchers("/show-suggestion" , "/show-suggestion/**").hasAnyAuthority("ADMIN" , "EXPERT")

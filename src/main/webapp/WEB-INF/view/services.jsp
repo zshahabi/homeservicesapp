@@ -57,6 +57,7 @@
                     <td>${order.requestAt.toString()}</td>
                     <td>
                         <jstl:if test="${role == 'admin' || role == 'expert'}">
+                             <a href="/set-done-order/${order.id}" class="btn btn-outline-success">Done</a>
                              <a href="/add-suggestion/${order.id}" class="btn btn-success">Add suggestion</a>
                              <a href="/show-suggestion/${order.id}" class="btn btn-primary">Show suggestion</a>
                              <a href="/order-payment/${order.id}" class="btn btn-info">Payment</a>

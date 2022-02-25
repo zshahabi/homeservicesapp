@@ -6,6 +6,7 @@ import com.home.services.data.entity.SubService;
 import com.home.services.data.entity.Suggestion;
 import com.home.services.data.entity.User;
 import com.home.services.data.entity.UserRegisterValidationCode;
+import com.home.services.data.enums.OrderStatus;
 import com.home.services.data.enums.Roles;
 import com.home.services.data.enums.UserStatus;
 import com.home.services.data.repository.UserRepository;
@@ -1132,5 +1133,32 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         if (authentication != null) new SecurityContextLogoutHandler().logout(request , response , authentication);
 
         return "login";
+    }
+
+    @RequestMapping(value = "/set-done-order/{ORDER_ID}", method = RequestMethod.GET)
+    @RolesAllowed({"ADMIN" , "EXPERT"})
+    public String setDoneOrder(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "ORDER_ID") final String strOrderId)
+    {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
+        final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
+
+        boolean result = false;
+        if (orderId > 0)
+        {
+            try
+            {
+                orderService.changeStatus(orderId , OrderStatus.DONE);
+                result = true;
+            }
+            catch (NotFoundOrderException e)
+            {
+                modelMap.put("error" , e.getMessage());
+            }
+        }
+
+        modelMap.put("operationName" , "Set done order");
+        modelMap.put("result" , result);
+        return "operation-users";
     }
 }
