@@ -13,6 +13,7 @@ import com.home.services.dto.DTOAddSubService;
 import com.home.services.dto.DTOAddSuggestion;
 import com.home.services.dto.DTOCustomerRegister;
 import com.home.services.dto.DTOExpertRegister;
+import com.home.services.dto.DTOPayment;
 import com.home.services.dto.DTOSearchUser;
 import com.home.services.dto.DTOUsers;
 import com.home.services.dto.mapper.CommentsMapper;
@@ -127,6 +128,8 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     public String addNewOrderView(final ModelMap model , final Authentication authentication)
     {
         setVarForHeader.set(model , authentication , "/service-view");
+
+        model.put("userEmail" , authentication.getName());
 
         model.put("subServiceNames" , getSubServiceNames());
         return "add-new-order";
@@ -936,6 +939,101 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         return "operation-users";
     }
 
+    //
+    //
+    // PART 4-5
+    //
+    //
+    @RequestMapping(value = "/customer-order-payment/{ORDER_ID}", method = RequestMethod.GET)
+    @RolesAllowed({"CUSTOMER"})
+    public String customerOrderPayment(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "ORDER_ID") final String strOrderId)
+    {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
 
+        final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
 
+        final AtomicBoolean result = new AtomicBoolean(false);
+
+        final AtomicBoolean onlinePayment = new AtomicBoolean(false);
+
+        if (orderId > 0)
+        {
+            final Optional<Order> orderFindById = orderService.orderRepository().findById(orderId);
+
+            orderFindById.ifPresentOrElse(order ->
+            {
+                final User customer = order.getCustomer();
+
+                if (customer.getEmail().equals(authentication.getName()))
+                {
+                    final int orderPrice = order.getPrice();
+                    final int accountCredit = customer.getAccountCredit();
+
+                    if (accountCredit >= orderPrice)
+                    {
+                        try
+                        {
+                            orderService.payment(orderId , 0);
+                            result.set(true);
+                        }
+                        catch (NotFoundOrderException | NotFoundSuggestionException | ThePaymentAmountIsInsufficient | ThisOrderHasBeenPaidException e)
+                        {
+                            modelMap.put("error" , e.getMessage());
+                        }
+                    }
+                    else
+                    {
+                        onlinePayment.set(true);
+                        modelMap.put("price" , order.getPrice());
+                        modelMap.put("orderId" , orderId);
+                        modelMap.put("orderName" , order.getName());
+                    }
+                }
+                else modelMap.put("error" , "Access denied");
+
+            } , () -> modelMap.put("error" , "Invalid order id"));
+        }
+
+        if (onlinePayment.get()) return "online-peymant";
+        else
+        {
+            modelMap.put("result" , result.get());
+            modelMap.put("operationName" , "Order payment");
+            return "operation-users";
+        }
+    }
+
+    @RequestMapping(value = "/customer-order-payment/{ORDER_ID}", method = RequestMethod.POST)
+    @RolesAllowed({"CUSTOMER"})
+    public String customerOrderPayment(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "ORDER_ID") final String strOrderId , @ModelAttribute("payment") final DTOPayment dtoPayment)
+    {
+        setVarForHeader.set(modelMap , authentication , "/service-view");
+
+        final long orderId = checkStrId(modelMap , strOrderId , "Invalid order id");
+
+        final AtomicBoolean result = new AtomicBoolean(false);
+
+        if (orderId > 0)
+        {
+            final Optional<Order> orderFindById = orderService.orderRepository().findById(orderId);
+
+            orderFindById.ifPresentOrElse(order ->
+            {
+                try
+                {
+                    orderService.payment(orderId , order.getSubService().getPrice());
+                    result.set(true);
+                }
+                catch (NotFoundOrderException | NotFoundSuggestionException | ThePaymentAmountIsInsufficient | ThisOrderHasBeenPaidException e)
+                {
+                    modelMap.put("error" , e.getMessage());
+                }
+
+            } , () -> modelMap.put("error" , "Invalid order id"));
+        }
+
+        modelMap.put("result" , result.get());
+        modelMap.put("operationName" , "Order payment");
+        return "operation-users";
+    }
 }

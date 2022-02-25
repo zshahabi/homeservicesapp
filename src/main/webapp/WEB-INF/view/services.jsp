@@ -16,12 +16,15 @@
 <div id="wrapper">
     <h1>Services</h1>
 
-    <div>
-        <button type="button" onclick="changeLocation('/add-new-order')" class="btn btn-outline-primary waves-effect" id="add-new-order">Add new order</button>
-        <button type="button" onclick="changeLocation('/add-subservice')" class="btn btn-outline-primary waves-effect" id="add-sub-service">Add sub service</button>
-        <button type="button" onclick="changeLocation('/add-main-service')" class="btn btn-outline-primary waves-effect" id="add-main-service">Add main service</button>
-        <button type="button" onclick="changeLocation('/sub-services')" class="btn btn-outline-primary waves-effect" id="sub-services">Sub services</button>
-    </div>
+    <jstl:if test="${role == 'ADMIN'}">
+        <div>
+            <button type="button" onclick="changeLocation('/add-new-order')" class="btn btn-outline-primary waves-effect" id="add-new-order">Add new order</button>
+            <button type="button" onclick="changeLocation('/add-subservice')" class="btn btn-outline-primary waves-effect" id="add-sub-service">Add sub service</button>
+            <button type="button" onclick="changeLocation('/add-main-service')" class="btn btn-outline-primary waves-effect" id="add-main-service">Add main service</button>
+            <button type="button" onclick="changeLocation('/sub-services')" class="btn btn-outline-primary waves-effect" id="sub-services">Sub services</button>
+        </div>
+    </jstl:if>
+
     <br />
     <table id="keywords">
         <thead>
@@ -41,24 +44,27 @@
         <tbody>
 
         <jstl:if test="${orders.size() > 0}">
-            <jstl:forEach items="${orders}" var="subService">
+            <jstl:forEach items="${orders}" var="order">
                 <tr>
-                    <td class="lalign">${subService.id}</td>
-                    <td>${subService.orderStatus.name()}</td>
-                    <td>${subService.name}</td>
-                    <td>${subService.customer.name}</td>
-                    <td>${subService.subService.name}</td>
-                    <td>${subService.expert.name}</td>
-                    <td>${subService.address.street}</td>
-                    <td>${subService.description}</td>
-                    <td>${subService.requestAt.toString()}</td>
+                    <td class="lalign">${order.id}</td>
+                    <td>${order.orderStatus.name()}</td>
+                    <td>${order.name}</td>
+                    <td>${order.customer.name}</td>
+                    <td>${order.subService.name}</td>
+                    <td>${order.expert.name}</td>
+                    <td>${order.address.street}</td>
+                    <td>${order.description}</td>
+                    <td>${order.requestAt.toString()}</td>
                     <td>
                         <jstl:if test="${role == 'admin' || role == 'expert'}">
-                             <a href="/add-suggestion/${subService.id}" class="btn btn-success">Add suggestion</a>
-                             <a href="/show-suggestion/${subService.id}" class="btn btn-primary">Show suggestion</a>
-                             <a href="/order-payment/${subService.id}" class="btn btn-info">Payment</a>
+                             <a href="/add-suggestion/${order.id}" class="btn btn-success">Add suggestion</a>
+                             <a href="/show-suggestion/${order.id}" class="btn btn-primary">Show suggestion</a>
+                             <a href="/order-payment/${order.id}" class="btn btn-info">Payment</a>
                         </jstl:if>
-                        <a href="/order-comments/${subService.id}" class="btn btn-primary">Comment</a>
+                        <a href="/order-comments/${order.id}" class="btn btn-primary">Comment</a>
+                        <jstl:if test="${role == 'customer' && order.orderStatus.name() == 'DONE'}">
+                            <a href="/customer-order-payment/${order.id}" class="btn btn-info">Payment</a>
+                        </jstl:if>
                     </td>
                 </tr>
             </jstl:forEach>
