@@ -33,6 +33,10 @@
 
     <button type="button" class="btn btn-dark float-right btn-back" onclick='changeLocation("/my-profile")'>My profile</button>
 
+    <jstl:if test="${hdrIsLogin}">
+        <button type="button" class="btn btn-dark float-right btn-back" onclick='changeLocation("/logout")'>Logout</button>
+    </jstl:if>
+
     <jstl:if test="${hdrIsLogin && hdrRole == 'admin'}">
         <button class="btn btn-outline-primary" type="button" onclick="changeLocation('/users/expert');">Experts info</button>
         <button class="btn btn-outline-primary" type="button" onclick="changeLocation('/users/customer');">Customer info</button>

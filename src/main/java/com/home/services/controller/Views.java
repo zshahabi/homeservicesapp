@@ -55,6 +55,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -65,6 +66,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -81,8 +84,8 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
                     MainServiceForAddSubServiceMapper mainServiceForAddSubServiceMapper , ExpertService expertService ,
                     CustomerService customerService , UsersMapper usersMapper , CommentService commentService ,
                     CommentsMapper commentsMapper , SubServiceMapper subServiceMapper ,
-                    ShowExpertMapper showExpertMapper , SetVarForHeader setVarForHeader , SendMail sendMail
-        , UserRegisterValidationCodeService userRegisterValidationCodeService)
+                    ShowExpertMapper showExpertMapper , SetVarForHeader setVarForHeader , SendMail sendMail ,
+                    UserRegisterValidationCodeService userRegisterValidationCodeService)
 {
 
     @RequestMapping(value = {"/" , "/home" , "/index"}, method = RequestMethod.GET)
@@ -474,8 +477,7 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
             userRegisterValidationCodeService.userRegisterValidationCodeRepository().save(validationCode);
 
-            final String url = String.format("%s/validation-code/%s/%d" ,
-                    sendMail.getEnvironment().getProperty("base.url") , code , userId);
+            final String url = String.format("%s/validation-code/%s/%d" , sendMail.getEnvironment().getProperty("base.url") , code , userId);
 
             System.out.println(480);
             sendMail.send(email , "Validation code service home" , "Please click " + url , SendMail.CONTENT_TEXT_PLAIN);
@@ -1074,9 +1076,7 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     }
 
     @RequestMapping(value = "/validation-code/{CODE}/{USER_ID}", method = RequestMethod.GET)
-    public String validationCode(final ModelMap modelMap , final Authentication authentication ,
-                                 @PathVariable(value = "CODE") final String strCode ,
-                                 @PathVariable(value = "USER_ID") final String strUserId)
+    public String validationCode(final ModelMap modelMap , final Authentication authentication , @PathVariable(value = "CODE") final String strCode , @PathVariable(value = "USER_ID") final String strUserId)
     {
         setVarForHeader.set(modelMap , authentication , "/home");
 
@@ -1122,5 +1122,15 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         modelMap.put("result" , result);
 
         return "operation-users";
+    }
+
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+    public String logout(final ModelMap modelMap , final Authentication authentication , final HttpServletResponse response , final HttpServletRequest request)
+    {
+        setVarForHeader.set(modelMap , authentication);
+
+        if (authentication != null) new SecurityContextLogoutHandler().logout(request , response , authentication);
+
+        return "login";
     }
 }
