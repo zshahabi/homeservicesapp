@@ -124,7 +124,6 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     }
 
     @RequestMapping(value = "/add-new-order", method = RequestMethod.GET)
-    @RolesAllowed({"ADMIN" , "EXPERT"})
     public String addNewOrderView(final ModelMap model , final Authentication authentication)
     {
         setVarForHeader.set(model , authentication , "/service-view");
@@ -136,7 +135,6 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     }
 
     @RequestMapping(value = "/add-new-order", method = RequestMethod.POST)
-    @RolesAllowed({"ADMIN" , "EXPERT"})
     public String addNewOrder(final ModelMap model , final Authentication authentication , @ModelAttribute("dtoAddNewOrder") DTOAddOrder dtoAddOrder)
     {
         setVarForHeader.set(model , authentication , "/service-view");
