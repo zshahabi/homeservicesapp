@@ -31,15 +31,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     protected void configure(HttpSecurity http) throws Exception
     {
         http.cors().disable()
-                .authorizeRequests().antMatchers("/" , "/register" , "/register-customer" , "/register-expert" , "/css/**")
+                .authorizeRequests().antMatchers(
+                        "/" ,
+                        "/register" ,
+                        "/register-customer" ,
+                        "/register-expert" ,
+                        "/css/**"
+                )
                 .permitAll()
+
+                .antMatchers("/api/**").permitAll()
+
+                // swagger
+                .antMatchers("/swagger-ui/**" , "/v3/api-docs/**").hasAuthority("ADMIN")
 
                 .antMatchers("/add-suggestion/**").hasAuthority("EXPERT")
                 .antMatchers("/add-main-service").hasAuthority("ADMIN")
                 .antMatchers("/add-subservice").hasAuthority("ADMIN")
-                .antMatchers("/add-new-order").hasAuthority("ADMIN")
-                .antMatchers("/service-view").hasAnyAuthority("ADMIN" , "EXPERT")
                 .antMatchers("/sub-services").hasAnyAuthority("ADMIN" , "EXPERT")
+                .antMatchers("/customer-order-payment" , "/customer-order-payment/**").hasAuthority("CUSTOMER")
                 .antMatchers("/sub-services/**").hasAnyAuthority("ADMIN")
                 .antMatchers("/show-suggestion" , "/show-suggestion/**").hasAnyAuthority("ADMIN" , "EXPERT")
                 .antMatchers("/users" , "/users/**").hasAuthority("ADMIN")

@@ -76,7 +76,7 @@
                      <jstl:if test="${role == 'expert'}">
                         <td>${user.rating}</td>
                         <td>${user.subService}</td>
-                        <td><img src="/expert-image/${user.id}" alt="Expert image" /></td>
+                        <td><img width="50" height="50" src="/expert-image/${user.id}" alt="Expert image" /></td>
                      </jstl:if>
                     <td>
 <%--                        <a href="/edit-user/${user.id}" class="btn btn-info">Edit user</a>--%>

@@ -52,7 +52,7 @@
                 <td class="lalign">${user.createdAt}</td>
                  <jstl:if test="${hdrRole == 'expert'}">
                      <td class="lalign">${user.rating}</td>
-                     <td><img src="/expert-image/${user.id}" alt="Expert image" /></td>
+                     <td><img src="/expert-image/${user.id}" width="50" height="50" alt="Expert image" /></td>
                  </jstl:if>
             </tr>
         </tbody>

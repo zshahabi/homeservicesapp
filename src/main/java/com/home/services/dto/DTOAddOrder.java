@@ -16,6 +16,8 @@ public class DTOAddOrder extends DTOAddress
     @JsonProperty("subservice_name")
     private String subServiceName;
 
+    private String price;
+
     @JsonProperty("email_customer")
     private String emailCustomer;
 

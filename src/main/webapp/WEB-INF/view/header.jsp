@@ -36,8 +36,10 @@
     <jstl:if test="${hdrIsLogin && hdrRole == 'admin'}">
         <button class="btn btn-outline-primary" type="button" onclick="changeLocation('/users/expert');">Experts info</button>
         <button class="btn btn-outline-primary" type="button" onclick="changeLocation('/users/customer');">Customer info</button>
-        <button class="btn btn-outline-primary" type="button" onclick="changeLocation('/service-view');">Services</button>
     </jstl:if>
+
+    <button class="btn btn-outline-primary" type="button" onclick="changeLocation('/service-view');">Services</button>
+
     <jstl:if test="${hdrIsLogin}">
       <button class="btn btn-outline-primary" type="button" onclick="changeLocation('/add-new-order');">Add order</button>
     </jstl:if>

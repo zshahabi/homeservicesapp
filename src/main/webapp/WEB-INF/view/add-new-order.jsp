@@ -48,7 +48,12 @@
    <input type="text" class="form-control" name="postalCode" placeholder="Postal code" />
  </label>
  <label>
-   <input type="text" class="form-control" name="emailCustomer" placeholder="email customer" />
+     <jstl:if test="${hdrRole == 'customer'}">
+        <input type="text" class="form-control" name="emailCustomer" placeholder="email customer" value="${userEmail}" />
+     </jstl:if>
+     <jstl:if test="${hdrRole != 'customer'}">
+        <input type="text" class="form-control" name="emailCustomer" placeholder="email customer" />
+     </jstl:if>
  </label>
   <br />
  <select class="form-select" name="subServiceName">
