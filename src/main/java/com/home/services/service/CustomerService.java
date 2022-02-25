@@ -29,7 +29,7 @@ public record CustomerService(UserRepository userRepository ,
     {
     }
 
-    public boolean register(final DTOCustomerRegister dtoCustomerRegister) throws InvalidPasswordException, NullPointerException, FoundEmailException, InvalidPostalCodeException
+    public long register(final DTOCustomerRegister dtoCustomerRegister) throws InvalidPasswordException, NullPointerException, FoundEmailException, InvalidPostalCodeException
     {
         if (checkEmptyUserInfo.check(dtoCustomerRegister))
         {
@@ -43,16 +43,16 @@ public record CustomerService(UserRepository userRepository ,
                 customer.setFamily(dtoCustomerRegister.getFamily());
                 customer.setEmail(dtoCustomerRegister.getEmail());
                 customer.setPassword(new BCryptPasswordEncoder().encode(dtoCustomerRegister.getPassword()));
-                customer.setUserStatus(UserStatus.WAITING_ACCEPT);
+                customer.setUserStatus(UserStatus.NEW_USER);
                 customer.setAddress(addressMapper.toAddress(dtoCustomerRegister));
 
                 customer = userRepository.save(customer);
 
-                return customer.getId() > 0;
+                return customer.getId();
             }
             else throw new FoundEmailException(dtoCustomerRegister.getEmail());
         }
-        return false;
+        return 0;
     }
 
     public List<User> searchCustomer(final DTOSearchUser dtoSearchUser) throws InvalidUserStatusException

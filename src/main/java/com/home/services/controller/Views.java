@@ -5,6 +5,7 @@ import com.home.services.data.entity.Order;
 import com.home.services.data.entity.SubService;
 import com.home.services.data.entity.Suggestion;
 import com.home.services.data.entity.User;
+import com.home.services.data.entity.UserRegisterValidationCode;
 import com.home.services.data.enums.Roles;
 import com.home.services.data.enums.UserStatus;
 import com.home.services.data.repository.UserRepository;
@@ -46,8 +47,10 @@ import com.home.services.service.CustomerService;
 import com.home.services.service.ExpertService;
 import com.home.services.service.MainServicesService;
 import com.home.services.service.OrderService;
+import com.home.services.service.SendMail;
 import com.home.services.service.SubServiceService;
 import com.home.services.service.SuggestionService;
+import com.home.services.service.UserRegisterValidationCodeService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -63,6 +66,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.RolesAllowed;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -77,8 +81,10 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
                     MainServiceForAddSubServiceMapper mainServiceForAddSubServiceMapper , ExpertService expertService ,
                     CustomerService customerService , UsersMapper usersMapper , CommentService commentService ,
                     CommentsMapper commentsMapper , SubServiceMapper subServiceMapper ,
-                    ShowExpertMapper showExpertMapper , SetVarForHeader setVarForHeader)
+                    ShowExpertMapper showExpertMapper , SetVarForHeader setVarForHeader , SendMail sendMail
+        , UserRegisterValidationCodeService userRegisterValidationCodeService)
 {
+
     @RequestMapping(value = {"/" , "/home" , "/index"}, method = RequestMethod.GET)
     public String index(final ModelMap modelMap , final Authentication authentication)
     {
@@ -124,7 +130,6 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     }
 
     @RequestMapping(value = "/add-new-order", method = RequestMethod.GET)
-    @RolesAllowed({"ADMIN" , "EXPERT"})
     public String addNewOrderView(final ModelMap model , final Authentication authentication)
     {
         setVarForHeader.set(model , authentication , "/service-view");
@@ -136,7 +141,6 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     }
 
     @RequestMapping(value = "/add-new-order", method = RequestMethod.POST)
-    @RolesAllowed({"ADMIN" , "EXPERT"})
     public String addNewOrder(final ModelMap model , final Authentication authentication , @ModelAttribute("dtoAddNewOrder") DTOAddOrder dtoAddOrder)
     {
         setVarForHeader.set(model , authentication , "/service-view");
@@ -433,7 +437,12 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
                     {
                         dtoRegister.setImg(image.getBytes());
 
-                        result = expertService.register(dtoRegister);
+                        long userId = expertService.register(dtoRegister);
+                        if (userId > 0)
+                        {
+                            result = true;
+                            sendEmail(userId , dtoRegister.getEmail());
+                        }
                     }
                     else modelMap.put("error" , "Image is null");
                 }
@@ -451,6 +460,29 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
         return "register";
     }
 
+    private void sendEmail(final long userId , final String email)
+    {
+        new Thread(() ->
+        {
+            final long code = sendMail.random.nextLong(99999999);
+            final User userFindById = customerService.userRepository().findById(userId);
+
+            final UserRegisterValidationCode validationCode = new UserRegisterValidationCode();
+            validationCode.setCode(code);
+            validationCode.setUser(userFindById);
+            validationCode.setCreditAt(LocalDateTime.now().minusMinutes(45));
+
+            userRegisterValidationCodeService.userRegisterValidationCodeRepository().save(validationCode);
+
+            final String url = String.format("%s/validation-code/%s/%d" ,
+                    sendMail.getEnvironment().getProperty("base.url") , code , userId);
+
+            System.out.println(480);
+            sendMail.send(email , "Validation code service home" , "Please click " + url , SendMail.CONTENT_TEXT_PLAIN);
+
+        }).start();
+    }
+
     @RequestMapping(value = "/register-customer", method = RequestMethod.POST)
     public String register(final ModelMap modelMap , final Authentication authentication , @ModelAttribute("addNewUser") final DTOCustomerRegister dtoRegister)
     {
@@ -465,7 +497,12 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
             {
                 try
                 {
-                    result = customerService.register(dtoRegister);
+                    long userId = customerService.register(dtoRegister);
+                    if (userId > 0)
+                    {
+                        result = true;
+                        sendEmail(userId , dtoRegister.getEmail());
+                    }
                 }
                 catch (FoundEmailException | InvalidPasswordException | NullPointerException | InvalidPostalCodeException e)
                 {
@@ -884,7 +921,6 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
     }
 
     @RequestMapping(value = "/my-profile", method = RequestMethod.GET)
-    @RolesAllowed({"ADMIN"})
     public String removeExpert(final ModelMap modelMap , final Authentication authentication)
     {
         if (authentication != null && authentication.isAuthenticated())
@@ -1034,6 +1070,57 @@ public record Views(OrderService orderService , SubServiceService subServiceServ
 
         modelMap.put("result" , result.get());
         modelMap.put("operationName" , "Order payment");
+        return "operation-users";
+    }
+
+    @RequestMapping(value = "/validation-code/{CODE}/{USER_ID}", method = RequestMethod.GET)
+    public String validationCode(final ModelMap modelMap , final Authentication authentication ,
+                                 @PathVariable(value = "CODE") final String strCode ,
+                                 @PathVariable(value = "USER_ID") final String strUserId)
+    {
+        setVarForHeader.set(modelMap , authentication , "/home");
+
+        boolean result = false;
+
+        final long userId = checkStrId(modelMap , strUserId , "Invalid user id");
+
+        if (userId > 0)
+        {
+            try
+            {
+                final long code = Long.parseLong(strCode);
+
+                System.out.println(code);
+                System.out.println(userId);
+
+                final UserRegisterValidationCode validationCode = userRegisterValidationCodeService.getValidationCode(code , userId);
+
+                if (validationCode != null)
+                {
+                    validationCode.setExpired(true);
+                    userRegisterValidationCodeService.userRegisterValidationCodeRepository().save(validationCode);
+
+                    final User user = validationCode.getUser();
+
+                    final Roles role = user.getRoles().get(0);
+                    if (role.equals(Roles.EXPERT)) user.setUserStatus(UserStatus.WAITING_ACCEPT);
+                    else user.setUserStatus(UserStatus.ACCEPTED);
+
+                    customerService.userRepository().save(user);
+
+                    result = true;
+                }
+                else modelMap.put("error" , "Invalid validation code");
+            }
+            catch (Exception e)
+            {
+                modelMap.put("error" , "invalid code");
+            }
+        }
+
+        modelMap.put("operationName" , "Validation code");
+        modelMap.put("result" , result);
+
         return "operation-users";
     }
 }

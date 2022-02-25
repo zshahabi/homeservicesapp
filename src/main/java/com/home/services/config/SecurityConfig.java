@@ -24,7 +24,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception
     {
-        auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(new BCryptPasswordEncoder()).usersByUsernameQuery("select `email`,`password`,`enable` from `users` where `email` = ?").authoritiesByUsernameQuery("select `email`,`roles` from `authorities` where `email` = ?");
+        auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(new BCryptPasswordEncoder())
+                .usersByUsernameQuery("select `email`,`password`,`enable` from `users` where `email` = ? and `user_status` = 'ACCEPTED'")
+                .authoritiesByUsernameQuery("select `email`,`roles` from `authorities` where `email` = ?");
     }
 
     @Override
@@ -40,14 +42,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 )
                 .permitAll()
 
+                .antMatchers("/validation-code/**").permitAll()
+
+                .antMatchers("/api/**").permitAll()
+
                 // swagger
                 .antMatchers("/swagger-ui/**" , "/v3/api-docs/**").hasAuthority("ADMIN")
 
                 .antMatchers("/add-suggestion/**").hasAuthority("EXPERT")
                 .antMatchers("/add-main-service").hasAuthority("ADMIN")
                 .antMatchers("/add-subservice").hasAuthority("ADMIN")
-//                .antMatchers("/add-new-order").hasAuthority("ADMIN","")
-//                .antMatchers("/service-view").hasAnyAuthority("ADMIN" , "EXPERT")
                 .antMatchers("/sub-services").hasAnyAuthority("ADMIN" , "EXPERT")
                 .antMatchers("/customer-order-payment" , "/customer-order-payment/**").hasAuthority("CUSTOMER")
                 .antMatchers("/sub-services/**").hasAnyAuthority("ADMIN")

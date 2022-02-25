@@ -43,7 +43,7 @@ public record ExpertService(UserRepository expertRepository ,
     {
     }
 
-    public boolean register(final DTOExpertRegister dtoExpertRegister) throws ImageSizeException, FoundEmailException, NullPointerException, InvalidPasswordException, InvalidPostalCodeException, InvalidImageException
+    public long register(final DTOExpertRegister dtoExpertRegister) throws ImageSizeException, FoundEmailException, NullPointerException, InvalidPasswordException, InvalidPostalCodeException, InvalidImageException
     {
         if (dtoExpertRegister.getImg().length > 0)
             if (dtoExpertRegister.getImg().length > MAX_LEN_IMAGE) throw new ImageSizeException();
@@ -70,18 +70,18 @@ public record ExpertService(UserRepository expertRepository ,
                 expert.setFamily(dtoExpertRegister.getFamily());
                 expert.setEmail(dtoExpertRegister.getEmail());
                 expert.setPassword(new BCryptPasswordEncoder().encode(dtoExpertRegister.getPassword()));
-                expert.setUserStatus(UserStatus.WAITING_ACCEPT);
+                expert.setUserStatus(UserStatus.NEW_USER);
                 expert.setAddress(addressMapper.toAddress(dtoExpertRegister));
 
                 expert.setImg(dtoExpertRegister.getImg());
 
                 expert = expertRepository.save(expert);
 
-                return expert.getId() > 0;
+                return expert.getId();
             }
             else throw new FoundEmailException(dtoExpertRegister.getEmail());
         }
-        return false;
+        return 0;
     }
 
     public boolean hasEmail(final String email)
